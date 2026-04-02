@@ -524,11 +524,12 @@
                 log('info', `   Types d'entités: ${allTypes.map(t => `"${t}" → "${getTypeLabel(t)}"`).join(', ')}`);
 
                 // ─── Finaliser ──────────────────────────────────────────────────
-                populateFilters();
+                dataLoaded = true;
+				populateFilters();
                 runDiagnostics();
                 refreshGraph();
                 document.getElementById('loading').classList.add('hidden');
-                dataLoaded = true;
+                
 
                 log('success', '\n✅ Chargement complet terminé');
 
