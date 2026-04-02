@@ -7,60 +7,192 @@
     <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
     <script src="https://unpkg.com/vis-network@9.1.9/standalone/umd/vis-network.min.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             overflow: hidden;
         }
         #controls {
-            position: absolute; top: 10px; left: 10px; z-index: 1000;
-            background: white; padding: 15px; border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.15); max-width: 280px;
-        }
-        #controls h3 { margin: 0 0 10px 0; font-size: 14px; color: #333; }
-        #controls label { display: flex; align-items: center; margin: 8px 0; font-size: 13px; cursor: pointer; }
-        #controls input[type="checkbox"] { margin-right: 8px; }
-        #controls select { width: 100%; padding: 6px; margin-top: 5px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; }
-        #controls button { width: 100%; padding: 8px; margin-top: 10px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; }
-        #controls button:hover { background: #2980b9; }
-        #mynetwork { width: 100vw; height: 100vh; background: #f8f9fa; }
-        #legend {
-            position: absolute; bottom: 10px; right: 10px;
-            background: white; padding: 15px; border-radius: 8px;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-            max-width: 250px; max-height: 400px; overflow-y: auto;
+            max-width: 280px;
         }
-        #legend h3 { margin: 0 0 10px 0; font-size: 14px; color: #333; }
-        .legend-section { margin-bottom: 15px; }
-        .legend-section h4 { font-size: 12px; color: #666; margin-bottom: 5px; }
-        .legend-item { display: flex; align-items: center; margin: 5px 0; font-size: 12px; }
-        .legend-color { width: 20px; height: 20px; margin-right: 10px; border-radius: 3px; border: 1px solid #ddd; }
+        #controls h3 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            color: #333;
+        }
+        #controls label {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        #controls input[type="checkbox"] {
+            margin-right: 8px;
+        }
+        #controls select {
+            width: 100%;
+            padding: 6px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        #controls button {
+            width: 100%;
+            padding: 8px;
+            margin-top: 10px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        #controls button:hover {
+            background: #2980b9;
+        }
+        #controls button.debug-btn {
+            background: #666;
+            margin-top: 5px;
+        }
+        #controls button.debug-btn:hover {
+            background: #555;
+        }
+        #mynetwork {
+            width: 100vw;
+            height: 100vh;
+            background: #f8f9fa;
+        }
+        #legend {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            max-width: 250px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        #legend h3 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            color: #333;
+        }
+        .legend-section {
+            margin-bottom: 15px;
+        }
+        .legend-section h4 {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+            font-size: 12px;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border-radius: 3px;
+            border: 1px solid #ddd;
+        }
         #stats {
-            position: absolute; top: 10px; right: 10px;
-            background: white; padding: 12px 15px; border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.15); font-size: 12px;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: white;
+            padding: 12px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            font-size: 12px;
         }
-        #stats strong { display: block; margin-bottom: 8px; color: #333; }
-        #stats div { margin: 3px 0; color: #666; }
+        #stats strong {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        #stats div {
+            margin: 3px 0;
+            color: #666;
+        }
         #loading {
-            position: absolute; top: 50%; left: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
             transform: translate(-50%, -50%);
-            background: white; padding: 30px; border-radius: 8px;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.2); text-align: center; z-index: 2000;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.2);
+            text-align: center;
+            z-index: 2000;
         }
-        #loading.hidden { display: none; }
+        #loading.hidden {
+            display: none;
+        }
         .spinner {
-            border: 3px solid #f3f3f3; border-top: 3px solid #3498db;
-            border-radius: 50%; width: 40px; height: 40px;
-            animation: spin 1s linear infinite; margin: 0 auto 15px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
         #debug {
-            position: absolute; bottom: 10px; left: 10px;
-            background: rgba(0,0,0,0.75); color: #0f0; padding: 8px 12px;
-            border-radius: 6px; font-size: 11px; font-family: monospace;
-            max-width: 320px; max-height: 160px; overflow-y: auto;
-            z-index: 2000; display: none;
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.9);
+            color: #0f0;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-family: 'Courier New', monospace;
+            max-width: 500px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 2000;
+            display: none;
+        }
+        #debug div {
+            margin: 2px 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .debug-error {
+            color: #ff6b6b;
+        }
+        .debug-success {
+            color: #51cf66;
+        }
+        .debug-info {
+            color: #74c0fc;
+        }
+        .debug-warning {
+            color: #ffd43b;
         }
     </style>
 </head>
@@ -78,15 +210,19 @@
         </label>
         <div style="margin-top: 10px;">
             <label style="display: block; margin-bottom: 3px;">Type de relation :</label>
-            <select id="filterRelation"><option value="all">Toutes</option></select>
+            <select id="filterRelation">
+                <option value="all">Toutes</option>
+            </select>
         </div>
         <div style="margin-top: 10px;">
             <label style="display: block; margin-bottom: 3px;">Type d'entité :</label>
-            <select id="filterEntity"><option value="all">Toutes</option></select>
+            <select id="filterEntity">
+                <option value="all">Toutes</option>
+            </select>
         </div>
         <button onclick="network && network.fit()">🎯 Recentrer</button>
         <button onclick="exportImage()">📸 Exporter PNG</button>
-        <button onclick="toggleDebug()" style="background:#666; margin-top:5px;">🐛 Debug</button>
+        <button onclick="toggleDebug()" class="debug-btn">🐛 Debug</button>
     </div>
 
     <div id="stats">
@@ -104,7 +240,44 @@
     <div id="debug"></div>
 
     <script>
-        // ─── État global ───────────────────────────────────────────────────────
+        // ═══════════════════════════════════════════════════════════════════════
+        // CONFIGURATION - AJUSTÉE SELON VOS COLONNES RÉELLES
+        // ═══════════════════════════════════════════════════════════════════════
+        const CONFIG = {
+            TABLES: {
+                ENTITES:         'ENTITES',
+                RELATIONS:       'Relations',
+                TYPES_RELATIONS: 'TYPES_RELATIONS'
+            },
+            
+            COLONNES: {
+                // ENTITES - avec underscores
+                ENTITE_NOM:         'Nom',
+                ENTITE_SIGLE:       'Sigle',
+                ENTITE_TYPE:        'Type_',        // ⬅️ Avec underscore
+                ENTITE_DESC:        'Description',
+                ENTITE_RESP:        'Responsable',
+                ENTITE_ACTIF:       'Actif',
+                
+                // RELATIONS - avec underscores
+                REL_SOURCE:         'Source_',      // ⬅️ Avec underscore
+                REL_CIBLE:          'Cible_',       // ⬅️ Avec underscore
+                REL_TYPE:           'Type_',        // ⬅️ Avec underscore
+                REL_INTENSITE:      'Intensite',
+                REL_BIDIRECT:       'Bidirectionnel',
+                REL_COMMENT:        'Commentaire',
+                REL_VALIDE:         'Valide',
+                
+                // TYPES_RELATIONS - avec underscores
+                TYPE_NOM:           'Nom_',         // ⬅️ Avec underscore
+                TYPE_COULEUR:       'Couleur_',     // ⬅️ Avec underscore
+                TYPE_EPAISSEUR:     'Epaisseur_'    // ⬅️ Avec underscore
+            }
+        };
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // Variables globales
+        // ═══════════════════════════════════════════════════════════════════════
         let network = null;
         let allEntities = [];
         let allRelations = [];
@@ -112,145 +285,481 @@
         let entityTypes = new Set();
         let dataLoaded = false;
 
-        // ─── Noms des tables Grist ─────────────────────────────────────────────
-        // ⚠️  IMPORTANT : si les noms ci-dessous ne correspondent pas, adaptez-les
-        // Pour trouver le vrai nom : dans Grist, cliquez sur "..." de la table → Rename
-        // Le nom interne (Table ID) est celui à utiliser ici (souvent sans accents)
-        const TABLE_ENTITES         = 'ENTITES';
-        const TABLE_RELATIONS       = 'Relations';        // R minuscule !
-        const TABLE_TYPES_RELATIONS = 'TYPES_RELATIONS';
-
-        // ─── Couleurs par type d'entité (liste de choix) ───────────────────────
+        // ═══════════════════════════════════════════════════════════════════════
+        // Couleurs et labels par type d'entité
+        // ⚠️ AJUSTEZ selon vos vraies valeurs de la colonne Type_
+        // ═══════════════════════════════════════════════════════════════════════
         const typeColors = {
-            'Direction':      '#E74C3C',
-            'Sous-direction': '#3498DB',
-            'Bureau':         '#2ECC71',
-            'Service':        '#F39C12'
+            // Codes courts (1 lettre)
+            'M': '#E74C3C',              // Mission - Rouge
+            'D': '#3498DB',              // Direction - Bleu
+            'SD': '#2ECC71',             // Sous-direction - Vert
+            'B': '#F39C12',              // Bureau - Orange
+            'S': '#9B59B6',              // Service - Violet
+            'P': '#1ABC9C',              // Pôle - Turquoise
+            'C': '#E67E22',              // Cellule - Orange foncé
+            'U': '#16A085',              // Unité - Vert foncé
+            
+            // Noms complets (au cas où)
+            'Mission': '#E74C3C',
+            'Direction': '#3498DB',
+            'Sous-direction': '#2ECC71',
+            'Bureau': '#F39C12',
+            'Service': '#9B59B6',
+            'Pôle': '#1ABC9C',
+            'Cellule': '#E67E22',
+            'Unité': '#16A085'
         };
 
-        // ─── Debug helper ──────────────────────────────────────────────────────
+        // Mapping code court → nom complet pour l'affichage
+        const typeLabels = {
+            'M': 'Mission',
+            'D': 'Direction',
+            'SD': 'Sous-direction',
+            'B': 'Bureau',
+            'S': 'Service',
+            'P': 'Pôle',
+            'C': 'Cellule',
+            'U': 'Unité'
+        };
+
+        // Fonction pour obtenir la couleur avec fallback
+        function getTypeColor(type) {
+            const color = typeColors[type];
+            if (!color) {
+                console.warn(`⚠️ Type "${type}" sans couleur définie, utilisation de la couleur par défaut`);
+                log('warning', `⚠️ Type sans couleur: "${type}"`);
+                return '#95A5A6';  // Gris par défaut
+            }
+            return color;
+        }
+
+        // Fonction pour obtenir le label d'affichage
+        function getTypeLabel(type) {
+            return typeLabels[type] || type;
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // Debug
+        // ═══════════════════════════════════════════════════════════════════════
         const dbg = document.getElementById('debug');
-        function log(...args) {
+        
+        function log(type, ...args) {
             console.log(...args);
-            const line = args.map(a => typeof a === 'object' ? JSON.stringify(a) : a).join(' ');
-            dbg.innerHTML += line + '<br>';
+            const line = args.map(a => 
+                typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a)
+            ).join(' ');
+            
+            const className = type === 'error' ? 'debug-error' : 
+                            type === 'success' ? 'debug-success' :
+                            type === 'warning' ? 'debug-warning' :
+                            'debug-info';
+            
+            dbg.innerHTML += `<div class="${className}">${line}</div>`;
             dbg.scrollTop = dbg.scrollHeight;
         }
-        function toggleDebug() { dbg.style.display = dbg.style.display === 'none' ? 'block' : 'none'; }
+        
+        function toggleDebug() { 
+            if (dbg.style.display === 'none') {
+                dbg.style.display = 'block';
+                if (!dataLoaded) {
+                    log('info', '⏳ Attendez que les données se chargent...');
+                }
+            } else {
+                dbg.style.display = 'none';
+            }
+        }
 
-        // ─── Grist ready ──────────────────────────────────────────────────────
-        grist.ready({ requiredAccess: 'read table' });
+        // ═══════════════════════════════════════════════════════════════════════
+        // Helper pour accéder aux colonnes
+        // ═══════════════════════════════════════════════════════════════════════
+        function getColumn(data, colName, idx) {
+            // Essaie d'abord sans underscore, puis avec
+            const value = data[colName]?.[idx] ?? data[colName + '_']?.[idx];
+            
+            // Si c'est un tableau (ChoiceList), prendre le premier élément
+            if (Array.isArray(value)) {
+                return value[0] || '';
+            }
+            
+            return value;
+        }
 
-        // ─── Chargement complet des 3 tables ──────────────────────────────────
+        // ═══════════════════════════════════════════════════════════════════════
+        // Grist Setup
+        // ═══════════════════════════════════════════════════════════════════════
+        grist.ready({
+            requiredAccess: 'read table',
+            allowSelectBy: true
+        });
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // Chargement des données
+        // ═══════════════════════════════════════════════════════════════════════
         async function loadAllData() {
             try {
-                log('🔄 fetchTable:', TABLE_ENTITES, TABLE_RELATIONS, TABLE_TYPES_RELATIONS);
+                log('info', '🔄 Début du chargement...');
+                log('info', `Configuration tables: ${CONFIG.TABLES.ENTITES}, ${CONFIG.TABLES.RELATIONS}, ${CONFIG.TABLES.TYPES_RELATIONS}`);
 
-                const [entitiesData, relationsData, typesData] = await Promise.all([
-                    grist.docApi.fetchTable(TABLE_ENTITES),
-                    grist.docApi.fetchTable(TABLE_RELATIONS),
-                    grist.docApi.fetchTable(TABLE_TYPES_RELATIONS)
-                ]);
+                // ─── Chargement table par table ─────────────────────────────────
+                log('info', '\n📥 Chargement ENTITÉS...');
+                const entitiesData = await grist.docApi.fetchTable(CONFIG.TABLES.ENTITES)
+                    .catch(e => {
+                        log('error', `❌ Erreur table ENTITÉS: ${e.message}`);
+                        throw new Error(`Table ${CONFIG.TABLES.ENTITES} introuvable. Vérifiez le nom exact.`);
+                    });
+                log('success', `✓ ENTITÉS chargée: ${entitiesData.id?.length || 0} lignes`);
+                log('info', `  Colonnes: ${Object.keys(entitiesData).join(', ')}`);
 
-                log('📦 Colonnes ENTITES:', Object.keys(entitiesData));
-                log('📦 Colonnes RELATIONS:', Object.keys(relationsData));
-                log('📦 Colonnes TYPES_RELATIONS:', Object.keys(typesData));
+                log('info', '\n📥 Chargement RELATIONS...');
+                const relationsData = await grist.docApi.fetchTable(CONFIG.TABLES.RELATIONS)
+                    .catch(e => {
+                        log('error', `❌ Erreur table RELATIONS: ${e.message}`);
+                        throw new Error(`Table ${CONFIG.TABLES.RELATIONS} introuvable. Vérifiez le nom exact.`);
+                    });
+                log('success', `✓ RELATIONS chargée: ${relationsData.id?.length || 0} lignes`);
+                log('info', `  Colonnes: ${Object.keys(relationsData).join(', ')}`);
 
-                // ── ENTITÉS ──
-                // Type est une liste de choix → Grist renvoie directement la valeur texte
-                allEntities = entitiesData.id.map((id, idx) => ({
-                    id,
-                    Nom:         entitiesData.Nom?.[idx]          || '',
-                    Sigle:       entitiesData.Sigle?.[idx]         || '',
-                    Type:        (entitiesData.Type_?.[idx] || [])[0] || '',  // ChoiceList → tableau, on prend [0]
-                    Description: entitiesData.Description?.[idx]   || '',
-                    Responsable: entitiesData.Responsable?.[idx]   || '',
-                    Actif:       entitiesData.Actif?.[idx] !== false
-                }));
+                log('info', '\n📥 Chargement TYPES_RELATIONS...');
+                const typesData = await grist.docApi.fetchTable(CONFIG.TABLES.TYPES_RELATIONS)
+                    .catch(e => {
+                        log('error', `❌ Erreur table TYPES_RELATIONS: ${e.message}`);
+                        throw new Error(`Table ${CONFIG.TABLES.TYPES_RELATIONS} introuvable. Vérifiez le nom exact.`);
+                    });
+                log('success', `✓ TYPES_RELATIONS chargée: ${typesData.id?.length || 0} lignes`);
+                log('info', `  Colonnes: ${Object.keys(typesData).join(', ')}`);
 
-                // Colonnes avec underscore final (noms réservés dans Grist)
-                allRelations = relationsData.id.map((id, idx) => ({
-                    id,
-                    Source:         relationsData.Source_?.[idx],
-                    Cible:          relationsData.Cible_?.[idx],
-                    Type:           relationsData.Type_?.[idx],
-                    Intensite:      relationsData.Intensite?.[idx]      || 'Moyenne',
-                    Bidirectionnel: relationsData.Bidirectionnel?.[idx] || false,
-                    Commentaire:    relationsData.Commentaire?.[idx]    || '',
-                    Valide:         relationsData.Valide?.[idx] !== false
-                }));
+                // ─── Transformer ENTITÉS ────────────────────────────────────────
+                log('info', '\n🔄 Transformation des données...');
+                
+                if (!entitiesData.id || entitiesData.id.length === 0) {
+                    throw new Error(`Table ${CONFIG.TABLES.ENTITES} est vide`);
+                }
 
-                // ── TYPES_RELATIONS ──
-                relationTypes = typesData.id.map((id, idx) => ({
-                    id,
-                    Nom:       typesData.Nom_?.[idx]       || '',
-                    Couleur:   typesData.Couleur_?.[idx]   || '#95A5A6',
-                    Epaisseur: typesData.Epaisseur_?.[idx] || 1
-                }));
+                allEntities = entitiesData.id.map((id, idx) => {
+                    const entity = {
+                        id: id,
+                        Nom: getColumn(entitiesData, CONFIG.COLONNES.ENTITE_NOM, idx) || '',
+                        Sigle: getColumn(entitiesData, CONFIG.COLONNES.ENTITE_SIGLE, idx) || '',
+                        Type: getColumn(entitiesData, CONFIG.COLONNES.ENTITE_TYPE, idx) || '',
+                        Description: getColumn(entitiesData, CONFIG.COLONNES.ENTITE_DESC, idx) || '',
+                        Responsable: getColumn(entitiesData, CONFIG.COLONNES.ENTITE_RESP, idx) || '',
+                        Actif: getColumn(entitiesData, CONFIG.COLONNES.ENTITE_ACTIF, idx) !== false
+                    };
+                    
+                    if (idx === 0) {
+                        log('info', '  Exemple entité[0]:');
+                        log('info', `    ${JSON.stringify(entity, null, 4)}`);
+                    }
+                    
+                    return entity;
+                });
 
-                log(`✅ Chargé: ${allEntities.length} entités, ${allRelations.length} relations, ${relationTypes.length} types`);
-                log('Exemple entité[0]:', allEntities[0]);
-                log('Exemple relation[0]:', allRelations[0]);
+                // ─── Transformer RELATIONS ──────────────────────────────────────
+                if (!relationsData.id || relationsData.id.length === 0) {
+                    log('warning', '⚠️ Table RELATIONS est vide');
+                    allRelations = [];
+                } else {
+                    allRelations = relationsData.id.map((id, idx) => {
+                        const relation = {
+                            id: id,
+                            Source: getColumn(relationsData, CONFIG.COLONNES.REL_SOURCE, idx),
+                            Cible: getColumn(relationsData, CONFIG.COLONNES.REL_CIBLE, idx),
+                            Type: getColumn(relationsData, CONFIG.COLONNES.REL_TYPE, idx),
+                            Intensité: getColumn(relationsData, CONFIG.COLONNES.REL_INTENSITE, idx) || 'Moyenne',
+                            Bidirectionnel: getColumn(relationsData, CONFIG.COLONNES.REL_BIDIRECT, idx) || false,
+                            Commentaire: getColumn(relationsData, CONFIG.COLONNES.REL_COMMENT, idx) || '',
+                            Validé: getColumn(relationsData, CONFIG.COLONNES.REL_VALIDE, idx) !== false
+                        };
+                        
+                        if (idx === 0) {
+                            log('info', '  Exemple relation[0]:');
+                            log('info', `    ${JSON.stringify(relation, null, 4)}`);
+                        }
+                        
+                        return relation;
+                    });
+                }
 
+                // ─── Transformer TYPES_RELATIONS ────────────────────────────────
+                if (!typesData.id || typesData.id.length === 0) {
+                    log('warning', '⚠️ Table TYPES_RELATIONS est vide');
+                    relationTypes = [];
+                } else {
+                    relationTypes = typesData.id.map((id, idx) => {
+                        const type = {
+                            id: id,
+                            Nom: getColumn(typesData, CONFIG.COLONNES.TYPE_NOM, idx) || '',
+                            Couleur: getColumn(typesData, CONFIG.COLONNES.TYPE_COULEUR, idx) || '#95A5A6',
+                            Épaisseur: getColumn(typesData, CONFIG.COLONNES.TYPE_EPAISSEUR, idx) || 1
+                        };
+                        
+                        if (idx === 0) {
+                            log('info', '  Exemple type[0]:');
+                            log('info', `    ${JSON.stringify(type, null, 4)}`);
+                        }
+                        
+                        return type;
+                    });
+                }
+
+                log('success', `\n✅ Transformation terminée:`);
+                log('info', `  ${allEntities.length} entités`);
+                log('info', `  ${allRelations.length} relations`);
+                log('info', `  ${relationTypes.length} types de relations`);
+
+                // ─── Extraire les types d'entités ──────────────────────────────
                 entityTypes = new Set(allEntities.map(e => e.Type).filter(Boolean));
+                
+                // AJOUT : Afficher toutes les valeurs de Type uniques
+                const allTypes = [...entityTypes];
+                log('info', `\n📂 Valeurs uniques de Type_ trouvées: ${JSON.stringify(allTypes)}`);
+                log('info', `   Types d'entités: ${allTypes.map(t => `"${t}" → "${getTypeLabel(t)}"`).join(', ')}`);
 
+                // ─── Finaliser ──────────────────────────────────────────────────
                 populateFilters();
+                runDiagnostics();
                 refreshGraph();
                 document.getElementById('loading').classList.add('hidden');
                 dataLoaded = true;
 
+                log('success', '\n✅ Chargement complet terminé');
+
             } catch (error) {
-                console.error('❌ Erreur chargement:', error);
-                log('❌ ERREUR:', error.message);
+                console.error('❌ Erreur:', error);
+                log('error', `\n❌ ERREUR FATALE: ${error.message}`);
+                log('error', `Stack: ${error.stack}`);
+                
                 document.getElementById('loading').innerHTML = `
-                    <div style="color: #e74c3c;">
-                        ⚠️ Erreur de chargement<br>
-                        <small>${error.message}</small><br><br>
-                        <small style="color:#666;">Vérifiez les noms des tables dans le code<br>
-                        (TABLE_ENTITES, TABLE_RELATIONS, TABLE_TYPES_RELATIONS)</small>
+                    <div style="color: #e74c3c; max-width: 500px;">
+                        <strong>⚠️ Erreur de chargement</strong><br><br>
+                        <div style="text-align: left; font-size: 12px; background: #f8f9fa; padding: 10px; border-radius: 4px;">
+                            ${error.message}
+                        </div>
+                        <div style="margin-top: 15px; font-size: 11px; color: #666; text-align: left;">
+                            <strong>Actions recommandées :</strong><br>
+                            1. Cliquez sur le bouton "🐛 Debug" en bas à gauche<br>
+                            2. Vérifiez dans CONFIG.TABLES les noms exacts de vos tables<br>
+                            3. Vérifiez dans CONFIG.COLONNES les noms de vos colonnes<br>
+                            4. Ouvrez la console (F12) pour plus de détails
+                        </div>
                     </div>
                 `;
-                // Afficher automatiquement le debug en cas d'erreur
+                
                 dbg.style.display = 'block';
             }
         }
 
-        // ─── Filtres ──────────────────────────────────────────────────────────
+        // ═══════════════════════════════════════════════════════════════════════
+        // Diagnostic complet
+        // ═══════════════════════════════════════════════════════════════════════
+        function runDiagnostics() {
+            log('info', '\n════════════════════════════════════════════════════════════');
+            log('info', '🔍 DIAGNOSTIC COMPLET');
+            log('info', '════════════════════════════════════════════════════════════');
+            
+            // ─── Diagnostic ENTITÉS ─────────────────────────────────────────────
+            log('info', '\n📊 ENTITÉS:');
+            log('info', `  Total: ${allEntities.length}`);
+            log('info', `  Actives: ${allEntities.filter(e => e.Actif).length}`);
+            log('info', `  Inactives: ${allEntities.filter(e => !e.Actif).length}`);
+            
+            // Grouper par type
+            const byType = {};
+            allEntities.forEach(e => {
+                const type = e.Type || '(vide)';
+                byType[type] = (byType[type] || 0) + 1;
+            });
+            
+            log('info', '  Répartition par type:');
+            Object.entries(byType).forEach(([type, count]) => {
+                const label = getTypeLabel(type);
+                log('info', `    - "${type}" (${label}): ${count}`);
+            });
+            
+            // Entités sans type
+            const noType = allEntities.filter(e => !e.Type).length;
+            if (noType > 0) {
+                log('warning', `  ⚠️ ${noType} entité(s) sans type défini`);
+            }
+            
+            // Exemples
+            log('info', '  Exemples (3 premières):');
+            allEntities.slice(0, 3).forEach((e, idx) => {
+                log('info', `    ${idx+1}. "${e.Nom}" | Type="${e.Type}" | Actif=${e.Actif}`);
+            });
+            
+            // ─── Diagnostic RELATIONS ───────────────────────────────────────────
+            log('info', '\n🔗 RELATIONS:');
+            log('info', `  Total: ${allRelations.length}`);
+            
+            if (allRelations.length === 0) {
+                log('warning', '  ⚠️ Aucune relation définie');
+            } else {
+                log('info', `  Validées: ${allRelations.filter(r => r.Validé).length}`);
+                log('info', `  Non validées: ${allRelations.filter(r => !r.Validé).length}`);
+                
+                // Grouper par type
+                const byTypeRel = {};
+                allRelations.forEach(r => {
+                    const typeId = r.Type || '(vide)';
+                    byTypeRel[typeId] = (byTypeRel[typeId] || 0) + 1;
+                });
+                
+                log('info', '  Répartition par type (ID):');
+                Object.entries(byTypeRel).forEach(([typeId, count]) => {
+                    const typeName = relationTypes.find(t => t.id === parseInt(typeId))?.Nom || '?';
+                    log('info', `    - Type ${typeId} (${typeName}): ${count}`);
+                });
+                
+                // Relations orphelines
+                const entityIds = new Set(allEntities.map(e => e.id));
+                const orphans = allRelations.filter(r => 
+                    !entityIds.has(r.Source) || !entityIds.has(r.Cible)
+                );
+                if (orphans.length > 0) {
+                    log('warning', `  ⚠️ ${orphans.length} relation(s) avec entité inexistante`);
+                }
+                
+                // Exemples
+                log('info', '  Exemples (3 premières):');
+                allRelations.slice(0, 3).forEach((r, idx) => {
+                    const srcEntity = allEntities.find(e => e.id === r.Source);
+                    const tgtEntity = allEntities.find(e => e.id === r.Cible);
+                    const relType = relationTypes.find(t => t.id === r.Type);
+                    
+                    log('info', `    ${idx+1}. ${srcEntity?.Nom || '?'} → ${tgtEntity?.Nom || '?'} (${relType?.Nom || '?'})`);
+                });
+            }
+            
+            // ─── Diagnostic TYPES_RELATIONS ─────────────────────────────────────
+            log('info', '\n🏷️  TYPES DE RELATIONS:');
+            log('info', `  Total: ${relationTypes.length}`);
+            
+            if (relationTypes.length === 0) {
+                log('error', '  ❌ AUCUN TYPE DE RELATION DÉFINI !');
+                log('info', '  💡 Ajoutez des lignes dans la table TYPES_RELATIONS');
+            } else {
+                relationTypes.forEach((type, idx) => {
+                    log('info', `    ${idx+1}. ID=${type.id}, Nom="${type.Nom}", Couleur=${type.Couleur}, Épaisseur=${type.Épaisseur}`);
+                });
+            }
+            
+            // ─── Diagnostic COULEURS ────────────────────────────────────────────
+            log('info', '\n🎨 VÉRIFICATION DES COULEURS:');
+            const definedColors = Object.keys(typeColors);
+            const actualTypes = [...entityTypes];
+            
+            log('info', `  Couleurs définies pour: ${definedColors.join(', ')}`);
+            log('info', `  Types dans les données: ${actualTypes.join(', ')}`);
+            
+            const missingColors = actualTypes.filter(t => !typeColors[t]);
+            if (missingColors.length > 0) {
+                log('warning', `  ⚠️ Types SANS couleur: ${missingColors.join(', ')}`);
+                log('info', `     → Ces entités apparaîtront en gris`);
+                log('info', `     💡 Ajoutez-les dans typeColors (ligne ~155)`);
+            } else {
+                log('success', '  ✅ Toutes les couleurs sont définies');
+            }
+            
+            // ─── Résumé ─────────────────────────────────────────────────────────
+            const problems = [];
+            if (relationTypes.length === 0) problems.push('Aucun type de relation');
+            if (entityTypes.size === 0) problems.push('Aucun type d\'entité');
+            if (allRelations.length === 0) problems.push('Aucune relation');
+            if (missingColors.length > 0) problems.push(`${missingColors.length} type(s) sans couleur`);
+            
+            if (problems.length > 0) {
+                log('warning', '\n⚠️  PROBLÈMES DÉTECTÉS:');
+                problems.forEach(p => log('warning', `  - ${p}`));
+            } else {
+                log('success', '\n✅ Aucun problème - configuration complète');
+            }
+            
+            log('info', '\n════════════════════════════════════════════════════════════');
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // Filtres
+        // ═══════════════════════════════════════════════════════════════════════
         function populateFilters() {
+            // ─── Filtre TYPES DE RELATIONS ──────────────────────────────────────
             const relationSelect = document.getElementById('filterRelation');
             relationSelect.innerHTML = '<option value="all">Toutes</option>';
-            relationTypes.forEach(type => {
+            
+            log('info', `\n📋 Remplissage filtre relations: ${relationTypes.length} types disponibles`);
+            
+            if (relationTypes.length === 0) {
+                log('error', '⚠️ Aucun type de relation pour le filtre');
                 const opt = document.createElement('option');
-                opt.value = type.id;
-                opt.textContent = type.Nom;
+                opt.disabled = true;
+                opt.textContent = '(Table TYPES_RELATIONS vide)';
                 relationSelect.appendChild(opt);
-            });
+            } else {
+                relationTypes.forEach((type, idx) => {
+                    if (!type.Nom) {
+                        log('warning', `  ⚠️ Type ${type.id} sans nom`);
+                        return;
+                    }
+                    
+                    const opt = document.createElement('option');
+                    opt.value = type.id;
+                    opt.textContent = type.Nom;
+                    relationSelect.appendChild(opt);
+                });
+                log('success', `✓ ${relationTypes.length} types ajoutés`);
+            }
 
+            // ─── Filtre TYPES D'ENTITÉS ─────────────────────────────────────────
             const entitySelect = document.getElementById('filterEntity');
             entitySelect.innerHTML = '<option value="all">Toutes</option>';
-            [...entityTypes].sort().forEach(type => {
+            
+            log('info', `\n📋 Remplissage filtre entités: ${entityTypes.size} types disponibles`);
+            
+            if (entityTypes.size === 0) {
+                log('error', '⚠️ Aucun type d\'entité pour le filtre');
                 const opt = document.createElement('option');
-                opt.value = type;
-                opt.textContent = type;
+                opt.disabled = true;
+                opt.textContent = '(Colonne Type_ vide)';
                 entitySelect.appendChild(opt);
-            });
+            } else {
+                [...entityTypes].sort().forEach((type, idx) => {
+                    const count = allEntities.filter(e => e.Type === type).length;
+                    const label = getTypeLabel(type);
+                    
+                    log('info', `  - "${type}" → "${label}" (${count})`);
+                    
+                    const opt = document.createElement('option');
+                    opt.value = type;
+                    opt.textContent = `${label} (${count})`;
+                    entitySelect.appendChild(opt);
+                });
+                log('success', `✓ ${entityTypes.size} types ajoutés`);
+            }
 
-            // Attacher les listeners une seule fois
+            // ─── Événements ─────────────────────────────────────────────────────
             relationSelect.onchange = refreshGraph;
             entitySelect.onchange = refreshGraph;
             document.getElementById('showInactive').onchange = refreshGraph;
+            
+            log('success', '\n✅ Filtres initialisés');
         }
 
-        // ─── Rendu du graphe ──────────────────────────────────────────────────
+        // ═══════════════════════════════════════════════════════════════════════
+        // Rendu du graphe
+        // ═══════════════════════════════════════════════════════════════════════
         function refreshGraph() {
-            if (!dataLoaded && allEntities.length === 0) return;
+            if (!dataLoaded || allEntities.length === 0) {
+                log('info', '⏸️  Pas de données à afficher');
+                return;
+            }
 
             const showInactive = document.getElementById('showInactive').checked;
-            const filterRel    = document.getElementById('filterRelation').value;
-            const filterEnt    = document.getElementById('filterEntity').value;
+            const filterRel = document.getElementById('filterRelation').value;
+            const filterEnt = document.getElementById('filterEntity').value;
 
             // Filtrer entités
-            const filteredEntities = allEntities.filter(e => {
+            let filteredEntities = allEntities.filter(e => {
                 if (!showInactive && !e.Actif) return false;
                 if (filterEnt !== 'all' && e.Type !== filterEnt) return false;
                 return true;
@@ -259,53 +768,64 @@
             const entityIds = new Set(filteredEntities.map(e => e.id));
 
             // Filtrer relations
-            const filteredRelations = allRelations.filter(r => {
-                if (!r.Valide) return false;
+            let filteredRelations = allRelations.filter(r => {
+                if (!r.Validé) return false;
                 if (filterRel !== 'all' && r.Type !== parseInt(filterRel)) return false;
-                // Les deux extrémités doivent être dans le graphe
                 return entityIds.has(r.Source) && entityIds.has(r.Cible);
             });
 
-            log(`🔍 Filtré: ${filteredEntities.length} entités, ${filteredRelations.length} relations`);
+            log('info', `\n🔍 Affichage: ${filteredEntities.length} entités, ${filteredRelations.length} relations`);
 
-            // Nœuds
+            // Préparer les nœuds avec couleurs
             const nodes = filteredEntities.map(e => {
-                const color = typeColors[e.Type] || '#95A5A6';
+                const color = getTypeColor(e.Type);  // ⬅️ Utilise la fonction avec fallback
+                const label = e.Sigle || e.Nom;
+                const typeLabel = getTypeLabel(e.Type);
+                
                 return {
-                    id:    e.id,
-                    label: e.Sigle || e.Nom,
-                    title: `<b>${e.Nom}</b><br>Type: ${e.Type || '—'}<br>Responsable: ${e.Responsable || 'N/A'}${e.Description ? '<br><br>' + e.Description : ''}`,
+                    id: e.id,
+                    label: label,
+                    title: `<b>${e.Nom}</b><br>Type: ${typeLabel}<br>Responsable: ${e.Responsable || 'N/A'}${e.Description ? '<br><br>' + e.Description : ''}`,
                     color: e.Actif ? color : '#CCCCCC',
-                    shape: e.Type === 'Direction' ? 'box' : 'ellipse',
-                    font: {
-                        size:  e.Type === 'Direction' ? 16 : 12,
-                        bold:  e.Type === 'Direction',
+                    shape: e.Type === 'D' || e.Type === 'Direction' ? 'box' : 'ellipse',
+                    font: { 
+                        size: (e.Type === 'D' || e.Type === 'Direction') ? 16 : 12,
+                        bold: (e.Type === 'D' || e.Type === 'Direction'),
                         color: e.Actif ? '#000000' : '#999999'
                     },
                     borderWidth: e.Actif ? 2 : 1,
-                    opacity:     e.Actif ? 1 : 0.5
+                    opacity: e.Actif ? 1 : 0.5
                 };
             });
 
-            // Arêtes
+            // Préparer les liens
             const edges = filteredRelations.map(r => {
                 const relType = relationTypes.find(t => t.id === r.Type) || {};
+                
                 return {
-                    from:   r.Source,
-                    to:     r.Cible,
-                    label:  relType.Nom || '',
-                    color:  { color: relType.Couleur || '#95A5A6' },
-                    width:  relType.Epaisseur || 1,
-                    arrows: r.Bidirectionnel ? 'to;from' : 'to',
-                    title:  `${relType.Nom || 'Relation'}<br>Intensité: ${r.Intensite}${r.Commentaire ? '<br><br>' + r.Commentaire : ''}`,
-                    dashes: r.Intensite === 'Faible'
+                    from: r.Source,
+                    to: r.Cible,
+                    label: relType.Nom || '',
+                    color: { color: relType.Couleur || '#95A5A6' },
+                    width: relType.Épaisseur || 1,
+                    arrows: r.Bidirectionnel ? 'to, from' : 'to',
+                    title: `${relType.Nom || 'Relation'}<br>Intensité: ${r.Intensité}${r.Commentaire ? '<br><br>' + r.Commentaire : ''}`,
+                    dashes: r.Intensité === 'Faible'
                 };
             });
 
+            // Options du graphe
             const options = {
-                nodes: { borderWidth: 2, borderWidthSelected: 4, shadow: true },
+                nodes: {
+                    borderWidth: 2,
+                    borderWidthSelected: 4,
+                    shadow: true
+                },
                 edges: {
-                    smooth: { type: 'continuous', roundness: 0.5 },
+                    smooth: {
+                        type: 'continuous',
+                        roundness: 0.5
+                    },
                     shadow: true
                 },
                 physics: {
@@ -317,7 +837,9 @@
                         springConstant: 0.04,
                         damping: 0.09
                     },
-                    stabilization: { iterations: 250 }
+                    stabilization: {
+                        iterations: 250
+                    }
                 },
                 interaction: {
                     hover: true,
@@ -327,20 +849,23 @@
                 }
             };
 
+            // Créer ou mettre à jour le graphe
             const container = document.getElementById('mynetwork');
-            const visData = { nodes, edges };
+            const data = { nodes: nodes, edges: edges };
 
             if (network) {
-                network.setData(visData);
+                network.setData(data);
             } else {
-                network = new vis.Network(container, visData, options);
-
-                network.on('selectNode', params => {
-                    log('Nœud sélectionné:', params.nodes[0]);
+                network = new vis.Network(container, data, options);
+                
+                network.on('selectNode', function(params) {
+                    const nodeId = params.nodes[0];
+                    const entity = allEntities.find(e => e.id === nodeId);
+                    log('info', `Nœud sélectionné: ${entity?.Nom || nodeId}`);
                 });
 
-                network.on('stabilizationIterationsDone', () => {
-                    log('✅ Stabilisation terminée');
+                network.on('stabilizationIterationsDone', function() {
+                    log('success', '✅ Stabilisation terminée');
                     network.setOptions({ physics: false });
                 });
             }
@@ -353,7 +878,7 @@
             document.getElementById('statsContent').innerHTML = `
                 <div>Entités affichées: <strong>${nodeCount}</strong></div>
                 <div>Relations affichées: <strong>${edgeCount}</strong></div>
-                <div style="margin-top:8px;padding-top:8px;border-top:1px solid #eee;">
+                <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee;">
                     Total entités: ${allEntities.length}<br>
                     Total relations: ${allRelations.length}
                 </div>
@@ -362,47 +887,69 @@
 
         function updateLegend() {
             let html = '<div class="legend-section"><h4>Types d\'entités</h4>';
-            Object.entries(typeColors).forEach(([type, color]) => {
-                html += `<div class="legend-item">
-                    <div class="legend-color" style="background:${color};"></div>
-                    <span>${type}</span>
-                </div>`;
+            
+            // Grouper les types présents dans les données
+            const usedTypes = new Set(allEntities.map(e => e.Type).filter(Boolean));
+            
+            [...usedTypes].sort().forEach(type => {
+                const color = getTypeColor(type);
+                const label = getTypeLabel(type);
+                const count = allEntities.filter(e => e.Type === type).length;
+                
+                html += `
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: ${color};"></div>
+                        <span>${label} (${count})</span>
+                    </div>
+                `;
             });
             html += '</div>';
 
             if (relationTypes.length > 0) {
                 html += '<div class="legend-section"><h4>Types de relations</h4>';
                 relationTypes.forEach(type => {
-                    html += `<div class="legend-item">
-                        <div class="legend-color" style="background:${type.Couleur};"></div>
-                        <span>${type.Nom}</span>
-                    </div>`;
+                    const count = allRelations.filter(r => r.Type === type.id).length;
+                    if (count > 0) {
+                        html += `
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: ${type.Couleur};"></div>
+                                <span>${type.Nom} (${count})</span>
+                            </div>
+                        `;
+                    }
                 });
                 html += '</div>';
             }
+
             document.getElementById('legendContent').innerHTML = html;
         }
 
         function exportImage() {
             if (!network) return;
+            
             const canvas = document.querySelector('#mynetwork canvas');
             const link = document.createElement('a');
             const date = new Date().toISOString().split('T')[0];
             link.download = `cartographie_${date}.png`;
             link.href = canvas.toDataURL('image/png');
             link.click();
+            
+            log('success', `📸 Image exportée: cartographie_${date}.png`);
         }
 
-        // ─── Réaction aux changements Grist ───────────────────────────────────
-        // onRecords est lié à la table sélectionnée dans le widget (RELATIONS).
-        // On recharge tout seulement si les données ont déjà été chargées une fois,
-        // pour éviter un double chargement au démarrage.
-        grist.onRecords(async function() {
-            log('🔔 onRecords déclenché → rechargement');
-            await loadAllData();
+        // ═══════════════════════════════════════════════════════════════════════
+        // Réaction aux changements
+        // ═══════════════════════════════════════════════════════════════════════
+        grist.onRecords(async function(records) {
+            if (dataLoaded) {
+                log('info', '🔔 Mise à jour détectée → rechargement');
+                await loadAllData();
+            }
         });
 
-        // ─── Démarrage ────────────────────────────────────────────────────────
+        // ═══════════════════════════════════════════════════════════════════════
+        // Démarrage
+        // ═══════════════════════════════════════════════════════════════════════
         loadAllData();
     </script>
 </body>
