@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cartographie Relationnelle</title>
+    <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
+    <script src="https://unpkg.com/vis-network@9.1.9/standalone/umd/vis-network.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            overflow: hidden;
+        }
+        #controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            max-width: 280px;
+        }
+        #controls h3 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            color: #333;
+        }
+        #controls label {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        #controls input[type="checkbox"] {
+            margin-right: 8px;
+        }
+        #controls select {
+            width: 100%;
+            padding: 6px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        #controls button {
+            width: 100%;
+            padding: 8px;
+            margin-top: 10px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        #controls button:hover {
+            background: #2980b9;
+        }
+        #mynetwork {
+            width: 100vw;
+            height: 100vh;
+            background: #f8f9fa;
+        }
+        #legend {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            max-width: 250px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        #legend h3 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            color: #333;
+        }
+        .legend-section {
+            margin-bottom: 15px;
+        }
+        .legend-section h4 {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+            font-size: 12px;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border-radius: 3px;
+            border: 1px solid #ddd;
+        }
+        #stats {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: white;
+            padding: 12px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            font-size: 12px;
+        }
+        #stats strong {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        #stats div {
+            margin: 3px 0;
+            color: #666;
+        }
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.2);
+            text-align: center;
+            z-index: 2000;
+        }
+        #loading.hidden {
+            display: none;
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">
+        <div class="spinner"></div>
+        <div>Chargement des données...</div>
+    </div>
+
+    <div id="controls">
+        <h3>🎛️ Filtres</h3>
+        <label>
+            <input type="checkbox" id="showInactive">
+            Afficher entités inactives
+        </label>
+        <div style="margin-top: 10px;">
+            <label style="display: block; margin-bottom: 3px;">Type de relation :</label>
+            <select id="filterRelation">
+                <option value="all">Toutes</option>
+            </select>
+        </div>
+        <div style="margin-top: 10px;">
+            <label style="display: block; margin-bottom: 3px;">Type d'entité :</label>
+            <select id="filterEntity">
+                <option value="all">Toutes</option>
+            </select>
+        </div>
+        <button onclick="network && network.fit()">🎯 Recentrer</button>
+        <button onclick="exportImage()">📸 Exporter PNG</button>
+    </div>
+
+    <div id="stats">
+        <strong>📊 Statistiques</strong>
+        <div id="statsContent">Chargement...</div>
+    </div>
+
+    <div id="mynetwork"></div>
+
+    <div id="legend">
+        <h3>📖 Légende</h3>
+        <div id="legendContent"></div>
+    </div>
+
+    <script>
+        let network = null;
+        let allEntities = [];
+        let allRelations = [];
+        let relationTypes = [];
+        let entityTypes = new Set();
+
+        // Couleurs par type d'entité
+        const typeColors = {
+            'Direction': '#E74C3C',
+            'Sous-direction': '#3498DB',
+            'Bureau': '#2ECC71',
+            'Service': '#F39C12'
+        };
+
+        // Configuration Grist
+        grist.ready({
+            requiredAccess: 'read table'
+        });
+
+        // Fonction de chargement des données
+        async function loadAllData() {
+            try {
+                console.log("🔄 Chargement des données depuis Grist...");
+
+                // Récupérer les tables via l'API Grist
+                const [entitiesData, relationsData, typesData] = await Promise.all([
+                    grist.docApi.fetchTable('ENTITÉS'),
+                    grist.docApi.fetchTable('RELATIONS'),
+                    grist.docApi.fetchTable('TYPES_RELATIONS')
+                ]);
+
+                // Transformer les données
+                allEntities = entitiesData.id.map((id, idx) => ({
+                    id: id,
+                    Nom: entitiesData.Nom[idx],
+                    Sigle: entitiesData.Sigle[idx],
+                    Type: entitiesData.Type[idx],
+                    Description: entitiesData.Description?.[idx] || '',
+                    Responsable: entitiesData.Responsable?.[idx] || '',
+                    Actif: entitiesData.Actif?.[idx] !== false
+                }));
+
+                allRelations = relationsData.id.map((id, idx) => ({
+                    id: id,
+                    Source: relationsData.Source[idx],
+                    Cible: relationsData.Cible[idx],
+                    Type: relationsData.Type[idx],
+                    Intensité: relationsData['Intensité']?.[idx] || 'Moyenne',
+                    Bidirectionnel: relationsData.Bidirectionnel?.[idx] || false,
+                    Commentaire: relationsData.Commentaire?.[idx] || '',
+                    Validé: relationsData['Validé']?.[idx] !== false
+                }));
+
+                relationTypes = typesData.id.map((id, idx) => ({
+                    id: id,
+                    Nom: typesData.Nom[idx],
+                    Couleur: typesData.Couleur?.[idx] || '#95A5A6',
+                    Épaisseur: typesData['Épaisseur']?.[idx] || 1
+                }));
+
+                console.log("✅ Données chargées:", {
+                    entités: allEntities.length,
+                    relations: allRelations.length,
+                    types: relationTypes.length
+                });
+
+                // Extraire les types d'entités
+                entityTypes = new Set(allEntities.map(e => e.Type).filter(t => t));
+
+                // Remplir les filtres
+                populateFilters();
+
+                // Afficher le graphe
+                refreshGraph();
+
+                // Masquer le loading
+                document.getElementById('loading').classList.add('hidden');
+
+            } catch (error) {
+                console.error("❌ Erreur chargement données:", error);
+                document.getElementById('loading').innerHTML = `
+                    <div style="color: #e74c3c;">
+                        ⚠️ Erreur de chargement<br>
+                        <small>${error.message}</small>
+                    </div>
+                `;
+            }
+        }
+
+        function populateFilters() {
+            // Filtre relations
+            const relationSelect = document.getElementById('filterRelation');
+            relationSelect.innerHTML = '<option value="all">Toutes</option>';
+            relationTypes.forEach(type => {
+                const opt = document.createElement('option');
+                opt.value = type.id;
+                opt.textContent = type.Nom;
+                relationSelect.appendChild(opt);
+            });
+            relationSelect.addEventListener('change', refreshGraph);
+
+            // Filtre entités
+            const entitySelect = document.getElementById('filterEntity');
+            entitySelect.innerHTML = '<option value="all">Toutes</option>';
+            [...entityTypes].sort().forEach(type => {
+                const opt = document.createElement('option');
+                opt.value = type;
+                opt.textContent = type;
+                entitySelect.appendChild(opt);
+            });
+            entitySelect.addEventListener('change', refreshGraph);
+
+            // Checkbox inactive
+            document.getElementById('showInactive').addEventListener('change', refreshGraph);
+        }
+
+        function refreshGraph() {
+            const showInactive = document.getElementById('showInactive').checked;
+            const filterRel = document.getElementById('filterRelation').value;
+            const filterEnt = document.getElementById('filterEntity').value;
+
+            // Filtrer entités
+            let filteredEntities = allEntities.filter(e => {
+                if (!showInactive && !e.Actif) return false;
+                if (filterEnt !== 'all' && e.Type !== filterEnt) return false;
+                return true;
+            });
+
+            const entityIds = new Set(filteredEntities.map(e => e.id));
+
+            // Filtrer relations
+            let filteredRelations = allRelations.filter(r => {
+                if (!r.Validé) return false;
+                if (filterRel !== 'all' && r.Type !== parseInt(filterRel)) return false;
+                return entityIds.has(r.Source) && entityIds.has(r.Cible);
+            });
+
+            // Préparer les nœuds
+            const nodes = filteredEntities.map(e => {
+                const color = typeColors[e.Type] || '#95A5A6';
+                const label = e.Sigle || e.Nom;
+                
+                return {
+                    id: e.id,
+                    label: label,
+                    title: `<b>${e.Nom}</b><br>Type: ${e.Type}<br>Responsable: ${e.Responsable || 'N/A'}${e.Description ? '<br><br>' + e.Description : ''}`,
+                    color: e.Actif ? color : '#CCCCCC',
+                    shape: e.Type === 'Direction' ? 'box' : 'ellipse',
+                    font: { 
+                        size: e.Type === 'Direction' ? 16 : 12,
+                        bold: e.Type === 'Direction',
+                        color: e.Actif ? '#000000' : '#999999'
+                    },
+                    borderWidth: e.Actif ? 2 : 1,
+                    opacity: e.Actif ? 1 : 0.5
+                };
+            });
+
+            // Préparer les liens
+            const edges = filteredRelations.map(r => {
+                const relType = relationTypes.find(t => t.id === r.Type) || {};
+                
+                return {
+                    from: r.Source,
+                    to: r.Cible,
+                    label: relType.Nom || '',
+                    color: { color: relType.Couleur || '#95A5A6' },
+                    width: relType.Épaisseur || 1,
+                    arrows: r.Bidirectionnel ? 'to, from' : 'to',
+                    title: `${relType.Nom || 'Relation'}<br>Intensité: ${r.Intensité}${r.Commentaire ? '<br><br>' + r.Commentaire : ''}`,
+                    dashes: r.Intensité === 'Faible'
+                };
+            });
+
+            // Options du graphe
+            const options = {
+                nodes: {
+                    borderWidth: 2,
+                    borderWidthSelected: 4,
+                    shadow: true
+                },
+                edges: {
+                    smooth: {
+                        type: 'continuous',
+                        roundness: 0.5
+                    },
+                    shadow: true
+                },
+                physics: {
+                    enabled: true,
+                    barnesHut: {
+                        gravitationalConstant: -3000,
+                        centralGravity: 0.3,
+                        springLength: 150,
+                        springConstant: 0.04,
+                        damping: 0.09
+                    },
+                    stabilization: {
+                        iterations: 250
+                    }
+                },
+                interaction: {
+                    hover: true,
+                    tooltipDelay: 200,
+                    navigationButtons: true,
+                    keyboard: true
+                }
+            };
+
+            // Créer ou mettre à jour le graphe
+            const container = document.getElementById('mynetwork');
+            const data = { nodes: nodes, edges: edges };
+
+            if (network) {
+                network.setData(data);
+            } else {
+                network = new vis.Network(container, data, options);
+                
+                // Événements
+                network.on('selectNode', function(params) {
+                    const nodeId = params.nodes[0];
+                    console.log("Nœud sélectionné:", nodeId);
+                    // Optionnel: positionner le curseur Grist
+                    // grist.setCursorPos({rowId: nodeId});
+                });
+
+                network.on('stabilizationIterationsDone', function() {
+                    console.log("✅ Stabilisation terminée");
+                    network.setOptions({ physics: false });
+                });
+            }
+
+            // Mise à jour des stats et légende
+            updateStats(nodes.length, edges.length);
+            updateLegend();
+        }
+
+        function updateStats(nodeCount, edgeCount) {
+            document.getElementById('statsContent').innerHTML = `
+                <div>Entités affichées: <strong>${nodeCount}</strong></div>
+                <div>Relations affichées: <strong>${edgeCount}</strong></div>
+                <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee;">
+                    Total entités: ${allEntities.length}<br>
+                    Total relations: ${allRelations.length}
+                </div>
+            `;
+        }
+
+        function updateLegend() {
+            let html = '<div class="legend-section"><h4>Types d\'entités</h4>';
+            Object.entries(typeColors).forEach(([type, color]) => {
+                html += `
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: ${color};"></div>
+                        <span>${type}</span>
+                    </div>
+                `;
+            });
+            html += '</div>';
+
+            if (relationTypes.length > 0) {
+                html += '<div class="legend-section"><h4>Types de relations</h4>';
+                relationTypes.forEach(type => {
+                    html += `
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: ${type.Couleur};"></div>
+                            <span>${type.Nom}</span>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            }
+
+            document.getElementById('legendContent').innerHTML = html;
+        }
+
+        function exportImage() {
+            if (!network) return;
+            
+            const canvas = document.querySelector('#mynetwork canvas');
+            const link = document.createElement('a');
+            const date = new Date().toISOString().split('T')[0];
+            link.download = `cartographie_${date}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        // Écouter les changements de données dans Grist
+        grist.onRecords(async function(records) {
+            console.log("🔔 Données mises à jour dans Grist");
+            await loadAllData();
+        });
+
+        // Initialisation au chargement
+        loadAllData();
+    </script>
+</body>
+</html>
