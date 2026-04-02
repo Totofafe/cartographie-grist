@@ -7,152 +7,60 @@
     <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
     <script src="https://unpkg.com/vis-network@9.1.9/standalone/umd/vis-network.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             overflow: hidden;
         }
         #controls {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            z-index: 1000;
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-            max-width: 280px;
+            position: absolute; top: 10px; left: 10px; z-index: 1000;
+            background: white; padding: 15px; border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15); max-width: 280px;
         }
-        #controls h3 {
-            margin: 0 0 10px 0;
-            font-size: 14px;
-            color: #333;
-        }
-        #controls label {
-            display: flex;
-            align-items: center;
-            margin: 8px 0;
-            font-size: 13px;
-            cursor: pointer;
-        }
-        #controls input[type="checkbox"] {
-            margin-right: 8px;
-        }
-        #controls select {
-            width: 100%;
-            padding: 6px;
-            margin-top: 5px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 13px;
-        }
-        #controls button {
-            width: 100%;
-            padding: 8px;
-            margin-top: 10px;
-            background: #3498db;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-        }
-        #controls button:hover {
-            background: #2980b9;
-        }
-        #mynetwork {
-            width: 100vw;
-            height: 100vh;
-            background: #f8f9fa;
-        }
+        #controls h3 { margin: 0 0 10px 0; font-size: 14px; color: #333; }
+        #controls label { display: flex; align-items: center; margin: 8px 0; font-size: 13px; cursor: pointer; }
+        #controls input[type="checkbox"] { margin-right: 8px; }
+        #controls select { width: 100%; padding: 6px; margin-top: 5px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; }
+        #controls button { width: 100%; padding: 8px; margin-top: 10px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; }
+        #controls button:hover { background: #2980b9; }
+        #mynetwork { width: 100vw; height: 100vh; background: #f8f9fa; }
         #legend {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
+            position: absolute; bottom: 10px; right: 10px;
+            background: white; padding: 15px; border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-            max-width: 250px;
-            max-height: 400px;
-            overflow-y: auto;
+            max-width: 250px; max-height: 400px; overflow-y: auto;
         }
-        #legend h3 {
-            margin: 0 0 10px 0;
-            font-size: 14px;
-            color: #333;
-        }
-        .legend-section {
-            margin-bottom: 15px;
-        }
-        .legend-section h4 {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 5px;
-        }
-        .legend-item {
-            display: flex;
-            align-items: center;
-            margin: 5px 0;
-            font-size: 12px;
-        }
-        .legend-color {
-            width: 20px;
-            height: 20px;
-            margin-right: 10px;
-            border-radius: 3px;
-            border: 1px solid #ddd;
-        }
+        #legend h3 { margin: 0 0 10px 0; font-size: 14px; color: #333; }
+        .legend-section { margin-bottom: 15px; }
+        .legend-section h4 { font-size: 12px; color: #666; margin-bottom: 5px; }
+        .legend-item { display: flex; align-items: center; margin: 5px 0; font-size: 12px; }
+        .legend-color { width: 20px; height: 20px; margin-right: 10px; border-radius: 3px; border: 1px solid #ddd; }
         #stats {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: white;
-            padding: 12px 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-            font-size: 12px;
+            position: absolute; top: 10px; right: 10px;
+            background: white; padding: 12px 15px; border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15); font-size: 12px;
         }
-        #stats strong {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-        }
-        #stats div {
-            margin: 3px 0;
-            color: #666;
-        }
+        #stats strong { display: block; margin-bottom: 8px; color: #333; }
+        #stats div { margin: 3px 0; color: #666; }
         #loading {
-            position: absolute;
-            top: 50%;
-            left: 50%;
+            position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.2);
-            text-align: center;
-            z-index: 2000;
+            background: white; padding: 30px; border-radius: 8px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.2); text-align: center; z-index: 2000;
         }
-        #loading.hidden {
-            display: none;
-        }
+        #loading.hidden { display: none; }
         .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #3498db;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
+            border: 3px solid #f3f3f3; border-top: 3px solid #3498db;
+            border-radius: 50%; width: 40px; height: 40px;
+            animation: spin 1s linear infinite; margin: 0 auto 15px;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #debug {
+            position: absolute; bottom: 10px; left: 10px;
+            background: rgba(0,0,0,0.75); color: #0f0; padding: 8px 12px;
+            border-radius: 6px; font-size: 11px; font-family: monospace;
+            max-width: 320px; max-height: 160px; overflow-y: auto;
+            z-index: 2000; display: none;
         }
     </style>
 </head>
@@ -170,18 +78,15 @@
         </label>
         <div style="margin-top: 10px;">
             <label style="display: block; margin-bottom: 3px;">Type de relation :</label>
-            <select id="filterRelation">
-                <option value="all">Toutes</option>
-            </select>
+            <select id="filterRelation"><option value="all">Toutes</option></select>
         </div>
         <div style="margin-top: 10px;">
             <label style="display: block; margin-bottom: 3px;">Type d'entité :</label>
-            <select id="filterEntity">
-                <option value="all">Toutes</option>
-            </select>
+            <select id="filterEntity"><option value="all">Toutes</option></select>
         </div>
         <button onclick="network && network.fit()">🎯 Recentrer</button>
         <button onclick="exportImage()">📸 Exporter PNG</button>
+        <button onclick="toggleDebug()" style="background:#666; margin-top:5px;">🐛 Debug</button>
     </div>
 
     <div id="stats">
@@ -196,98 +101,130 @@
         <div id="legendContent"></div>
     </div>
 
+    <div id="debug"></div>
+
     <script>
+        // ─── État global ───────────────────────────────────────────────────────
         let network = null;
         let allEntities = [];
         let allRelations = [];
         let relationTypes = [];
         let entityTypes = new Set();
+        let dataLoaded = false;
 
-        // Couleurs par type d'entité
+        // ─── Noms des tables Grist ─────────────────────────────────────────────
+        // ⚠️  IMPORTANT : si les noms ci-dessous ne correspondent pas, adaptez-les
+        // Pour trouver le vrai nom : dans Grist, cliquez sur "..." de la table → Rename
+        // Le nom interne (Table ID) est celui à utiliser ici (souvent sans accents)
+        const TABLE_ENTITES        = 'ENTITES';          // était 'ENTITÉS' → accent retiré
+        const TABLE_RELATIONS      = 'RELATIONS';
+        const TABLE_TYPES_RELATIONS = 'TYPES_RELATIONS';
+
+        // ─── Couleurs par type d'entité (liste de choix) ───────────────────────
         const typeColors = {
-            'Direction': '#E74C3C',
+            'Direction':      '#E74C3C',
             'Sous-direction': '#3498DB',
-            'Bureau': '#2ECC71',
-            'Service': '#F39C12'
+            'Bureau':         '#2ECC71',
+            'Service':        '#F39C12'
         };
 
-        // Configuration Grist
-        grist.ready({
-            requiredAccess: 'read table'
-        });
+        // ─── Debug helper ──────────────────────────────────────────────────────
+        const dbg = document.getElementById('debug');
+        function log(...args) {
+            console.log(...args);
+            const line = args.map(a => typeof a === 'object' ? JSON.stringify(a) : a).join(' ');
+            dbg.innerHTML += line + '<br>';
+            dbg.scrollTop = dbg.scrollHeight;
+        }
+        function toggleDebug() { dbg.style.display = dbg.style.display === 'none' ? 'block' : 'none'; }
 
-        // Fonction de chargement des données
+        // ─── Grist ready ──────────────────────────────────────────────────────
+        grist.ready({ requiredAccess: 'read table' });
+
+        // ─── Chargement complet des 3 tables ──────────────────────────────────
         async function loadAllData() {
             try {
-                console.log("🔄 Chargement des données depuis Grist...");
+                log('🔄 fetchTable:', TABLE_ENTITES, TABLE_RELATIONS, TABLE_TYPES_RELATIONS);
 
-                // Récupérer les tables via l'API Grist
                 const [entitiesData, relationsData, typesData] = await Promise.all([
-                    grist.docApi.fetchTable('ENTITÉS'),
-                    grist.docApi.fetchTable('RELATIONS'),
-                    grist.docApi.fetchTable('TYPES_RELATIONS')
+                    grist.docApi.fetchTable(TABLE_ENTITES),
+                    grist.docApi.fetchTable(TABLE_RELATIONS),
+                    grist.docApi.fetchTable(TABLE_TYPES_RELATIONS)
                 ]);
 
-                // Transformer les données
+                log('📦 Colonnes ENTITES:', Object.keys(entitiesData));
+                log('📦 Colonnes RELATIONS:', Object.keys(relationsData));
+                log('📦 Colonnes TYPES_RELATIONS:', Object.keys(typesData));
+
+                // ── ENTITÉS ──
+                // Type est une liste de choix → Grist renvoie directement la valeur texte
                 allEntities = entitiesData.id.map((id, idx) => ({
-                    id: id,
-                    Nom: entitiesData.Nom[idx],
-                    Sigle: entitiesData.Sigle[idx],
-                    Type: entitiesData.Type[idx],
-                    Description: entitiesData.Description?.[idx] || '',
-                    Responsable: entitiesData.Responsable?.[idx] || '',
-                    Actif: entitiesData.Actif?.[idx] !== false
+                    id,
+                    Nom:         entitiesData.Nom?.[idx]          || '',
+                    Sigle:       entitiesData.Sigle?.[idx]         || '',
+                    Type:        entitiesData.Type?.[idx]          || '',   // texte direct (Choice)
+                    Description: entitiesData.Description?.[idx]   || '',
+                    Responsable: entitiesData.Responsable?.[idx]   || '',
+                    Actif:       entitiesData.Actif?.[idx] !== false
                 }));
+
+                // ── RELATIONS ──
+                // Source et Cible sont des colonnes Reference → Grist renvoie l'ID de la ligne référencée
+                // Type est aussi une Reference → Grist renvoie un ID numérique
+                // Validé et Intensité peuvent avoir des accents dans le nom de colonne → on cherche avec fallback
+                const valideKey   = Object.keys(relationsData).find(k => k.startsWith('Valid')) || 'Valide';
+                const intensiteKey = Object.keys(relationsData).find(k => k.startsWith('Intensit')) || 'Intensite';
 
                 allRelations = relationsData.id.map((id, idx) => ({
-                    id: id,
-                    Source: relationsData.Source[idx],
-                    Cible: relationsData.Cible[idx],
-                    Type: relationsData.Type[idx],
-                    Intensité: relationsData['Intensité']?.[idx] || 'Moyenne',
+                    id,
+                    Source:         relationsData.Source?.[idx],
+                    Cible:          relationsData.Cible?.[idx],
+                    Type:           relationsData.Type?.[idx],           // ID numérique → sera résolu via relationTypes
+                    Intensite:      relationsData[intensiteKey]?.[idx]  || 'Moyenne',
                     Bidirectionnel: relationsData.Bidirectionnel?.[idx] || false,
-                    Commentaire: relationsData.Commentaire?.[idx] || '',
-                    Validé: relationsData['Validé']?.[idx] !== false
+                    Commentaire:    relationsData.Commentaire?.[idx]    || '',
+                    Valide:         relationsData[valideKey]?.[idx] !== false
                 }));
+
+                // ── TYPES_RELATIONS ──
+                const epaisseurKey = Object.keys(typesData).find(k => k.startsWith('Epaisseur') || k.startsWith('Épaisseur')) || 'Epaisseur';
 
                 relationTypes = typesData.id.map((id, idx) => ({
-                    id: id,
-                    Nom: typesData.Nom[idx],
-                    Couleur: typesData.Couleur?.[idx] || '#95A5A6',
-                    Épaisseur: typesData['Épaisseur']?.[idx] || 1
+                    id,
+                    Nom:      typesData.Nom?.[idx]              || '',
+                    Couleur:  typesData.Couleur?.[idx]          || '#95A5A6',
+                    Epaisseur: typesData[epaisseurKey]?.[idx]   || 1
                 }));
 
-                console.log("✅ Données chargées:", {
-                    entités: allEntities.length,
-                    relations: allRelations.length,
-                    types: relationTypes.length
-                });
+                log(`✅ Chargé: ${allEntities.length} entités, ${allRelations.length} relations, ${relationTypes.length} types`);
+                log('Exemple entité[0]:', allEntities[0]);
+                log('Exemple relation[0]:', allRelations[0]);
 
-                // Extraire les types d'entités
-                entityTypes = new Set(allEntities.map(e => e.Type).filter(t => t));
+                entityTypes = new Set(allEntities.map(e => e.Type).filter(Boolean));
 
-                // Remplir les filtres
                 populateFilters();
-
-                // Afficher le graphe
                 refreshGraph();
-
-                // Masquer le loading
                 document.getElementById('loading').classList.add('hidden');
+                dataLoaded = true;
 
             } catch (error) {
-                console.error("❌ Erreur chargement données:", error);
+                console.error('❌ Erreur chargement:', error);
+                log('❌ ERREUR:', error.message);
                 document.getElementById('loading').innerHTML = `
                     <div style="color: #e74c3c;">
                         ⚠️ Erreur de chargement<br>
-                        <small>${error.message}</small>
+                        <small>${error.message}</small><br><br>
+                        <small style="color:#666;">Vérifiez les noms des tables dans le code<br>
+                        (TABLE_ENTITES, TABLE_RELATIONS, TABLE_TYPES_RELATIONS)</small>
                     </div>
                 `;
+                // Afficher automatiquement le debug en cas d'erreur
+                dbg.style.display = 'block';
             }
         }
 
+        // ─── Filtres ──────────────────────────────────────────────────────────
         function populateFilters() {
-            // Filtre relations
             const relationSelect = document.getElementById('filterRelation');
             relationSelect.innerHTML = '<option value="all">Toutes</option>';
             relationTypes.forEach(type => {
@@ -296,9 +233,7 @@
                 opt.textContent = type.Nom;
                 relationSelect.appendChild(opt);
             });
-            relationSelect.addEventListener('change', refreshGraph);
 
-            // Filtre entités
             const entitySelect = document.getElementById('filterEntity');
             entitySelect.innerHTML = '<option value="all">Toutes</option>';
             [...entityTypes].sort().forEach(type => {
@@ -307,19 +242,23 @@
                 opt.textContent = type;
                 entitySelect.appendChild(opt);
             });
-            entitySelect.addEventListener('change', refreshGraph);
 
-            // Checkbox inactive
-            document.getElementById('showInactive').addEventListener('change', refreshGraph);
+            // Attacher les listeners une seule fois
+            relationSelect.onchange = refreshGraph;
+            entitySelect.onchange = refreshGraph;
+            document.getElementById('showInactive').onchange = refreshGraph;
         }
 
+        // ─── Rendu du graphe ──────────────────────────────────────────────────
         function refreshGraph() {
+            if (!dataLoaded && allEntities.length === 0) return;
+
             const showInactive = document.getElementById('showInactive').checked;
-            const filterRel = document.getElementById('filterRelation').value;
-            const filterEnt = document.getElementById('filterEntity').value;
+            const filterRel    = document.getElementById('filterRelation').value;
+            const filterEnt    = document.getElementById('filterEntity').value;
 
             // Filtrer entités
-            let filteredEntities = allEntities.filter(e => {
+            const filteredEntities = allEntities.filter(e => {
                 if (!showInactive && !e.Actif) return false;
                 if (filterEnt !== 'all' && e.Type !== filterEnt) return false;
                 return true;
@@ -328,61 +267,53 @@
             const entityIds = new Set(filteredEntities.map(e => e.id));
 
             // Filtrer relations
-            let filteredRelations = allRelations.filter(r => {
-                if (!r.Validé) return false;
+            const filteredRelations = allRelations.filter(r => {
+                if (!r.Valide) return false;
                 if (filterRel !== 'all' && r.Type !== parseInt(filterRel)) return false;
+                // Les deux extrémités doivent être dans le graphe
                 return entityIds.has(r.Source) && entityIds.has(r.Cible);
             });
 
-            // Préparer les nœuds
+            log(`🔍 Filtré: ${filteredEntities.length} entités, ${filteredRelations.length} relations`);
+
+            // Nœuds
             const nodes = filteredEntities.map(e => {
                 const color = typeColors[e.Type] || '#95A5A6';
-                const label = e.Sigle || e.Nom;
-                
                 return {
-                    id: e.id,
-                    label: label,
-                    title: `<b>${e.Nom}</b><br>Type: ${e.Type}<br>Responsable: ${e.Responsable || 'N/A'}${e.Description ? '<br><br>' + e.Description : ''}`,
+                    id:    e.id,
+                    label: e.Sigle || e.Nom,
+                    title: `<b>${e.Nom}</b><br>Type: ${e.Type || '—'}<br>Responsable: ${e.Responsable || 'N/A'}${e.Description ? '<br><br>' + e.Description : ''}`,
                     color: e.Actif ? color : '#CCCCCC',
                     shape: e.Type === 'Direction' ? 'box' : 'ellipse',
-                    font: { 
-                        size: e.Type === 'Direction' ? 16 : 12,
-                        bold: e.Type === 'Direction',
+                    font: {
+                        size:  e.Type === 'Direction' ? 16 : 12,
+                        bold:  e.Type === 'Direction',
                         color: e.Actif ? '#000000' : '#999999'
                     },
                     borderWidth: e.Actif ? 2 : 1,
-                    opacity: e.Actif ? 1 : 0.5
+                    opacity:     e.Actif ? 1 : 0.5
                 };
             });
 
-            // Préparer les liens
+            // Arêtes
             const edges = filteredRelations.map(r => {
                 const relType = relationTypes.find(t => t.id === r.Type) || {};
-                
                 return {
-                    from: r.Source,
-                    to: r.Cible,
-                    label: relType.Nom || '',
-                    color: { color: relType.Couleur || '#95A5A6' },
-                    width: relType.Épaisseur || 1,
-                    arrows: r.Bidirectionnel ? 'to, from' : 'to',
-                    title: `${relType.Nom || 'Relation'}<br>Intensité: ${r.Intensité}${r.Commentaire ? '<br><br>' + r.Commentaire : ''}`,
-                    dashes: r.Intensité === 'Faible'
+                    from:   r.Source,
+                    to:     r.Cible,
+                    label:  relType.Nom || '',
+                    color:  { color: relType.Couleur || '#95A5A6' },
+                    width:  relType.Epaisseur || 1,
+                    arrows: r.Bidirectionnel ? 'to;from' : 'to',
+                    title:  `${relType.Nom || 'Relation'}<br>Intensité: ${r.Intensite}${r.Commentaire ? '<br><br>' + r.Commentaire : ''}`,
+                    dashes: r.Intensite === 'Faible'
                 };
             });
 
-            // Options du graphe
             const options = {
-                nodes: {
-                    borderWidth: 2,
-                    borderWidthSelected: 4,
-                    shadow: true
-                },
+                nodes: { borderWidth: 2, borderWidthSelected: 4, shadow: true },
                 edges: {
-                    smooth: {
-                        type: 'continuous',
-                        roundness: 0.5
-                    },
+                    smooth: { type: 'continuous', roundness: 0.5 },
                     shadow: true
                 },
                 physics: {
@@ -394,9 +325,7 @@
                         springConstant: 0.04,
                         damping: 0.09
                     },
-                    stabilization: {
-                        iterations: 250
-                    }
+                    stabilization: { iterations: 250 }
                 },
                 interaction: {
                     hover: true,
@@ -406,30 +335,24 @@
                 }
             };
 
-            // Créer ou mettre à jour le graphe
             const container = document.getElementById('mynetwork');
-            const data = { nodes: nodes, edges: edges };
+            const visData = { nodes, edges };
 
             if (network) {
-                network.setData(data);
+                network.setData(visData);
             } else {
-                network = new vis.Network(container, data, options);
-                
-                // Événements
-                network.on('selectNode', function(params) {
-                    const nodeId = params.nodes[0];
-                    console.log("Nœud sélectionné:", nodeId);
-                    // Optionnel: positionner le curseur Grist
-                    // grist.setCursorPos({rowId: nodeId});
+                network = new vis.Network(container, visData, options);
+
+                network.on('selectNode', params => {
+                    log('Nœud sélectionné:', params.nodes[0]);
                 });
 
-                network.on('stabilizationIterationsDone', function() {
-                    console.log("✅ Stabilisation terminée");
+                network.on('stabilizationIterationsDone', () => {
+                    log('✅ Stabilisation terminée');
                     network.setOptions({ physics: false });
                 });
             }
 
-            // Mise à jour des stats et légende
             updateStats(nodes.length, edges.length);
             updateLegend();
         }
@@ -438,7 +361,7 @@
             document.getElementById('statsContent').innerHTML = `
                 <div>Entités affichées: <strong>${nodeCount}</strong></div>
                 <div>Relations affichées: <strong>${edgeCount}</strong></div>
-                <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee;">
+                <div style="margin-top:8px;padding-top:8px;border-top:1px solid #eee;">
                     Total entités: ${allEntities.length}<br>
                     Total relations: ${allRelations.length}
                 </div>
@@ -448,34 +371,28 @@
         function updateLegend() {
             let html = '<div class="legend-section"><h4>Types d\'entités</h4>';
             Object.entries(typeColors).forEach(([type, color]) => {
-                html += `
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: ${color};"></div>
-                        <span>${type}</span>
-                    </div>
-                `;
+                html += `<div class="legend-item">
+                    <div class="legend-color" style="background:${color};"></div>
+                    <span>${type}</span>
+                </div>`;
             });
             html += '</div>';
 
             if (relationTypes.length > 0) {
                 html += '<div class="legend-section"><h4>Types de relations</h4>';
                 relationTypes.forEach(type => {
-                    html += `
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: ${type.Couleur};"></div>
-                            <span>${type.Nom}</span>
-                        </div>
-                    `;
+                    html += `<div class="legend-item">
+                        <div class="legend-color" style="background:${type.Couleur};"></div>
+                        <span>${type.Nom}</span>
+                    </div>`;
                 });
                 html += '</div>';
             }
-
             document.getElementById('legendContent').innerHTML = html;
         }
 
         function exportImage() {
             if (!network) return;
-            
             const canvas = document.querySelector('#mynetwork canvas');
             const link = document.createElement('a');
             const date = new Date().toISOString().split('T')[0];
@@ -484,13 +401,16 @@
             link.click();
         }
 
-        // Écouter les changements de données dans Grist
-        grist.onRecords(async function(records) {
-            console.log("🔔 Données mises à jour dans Grist");
+        // ─── Réaction aux changements Grist ───────────────────────────────────
+        // onRecords est lié à la table sélectionnée dans le widget (RELATIONS).
+        // On recharge tout seulement si les données ont déjà été chargées une fois,
+        // pour éviter un double chargement au démarrage.
+        grist.onRecords(async function() {
+            log('🔔 onRecords déclenché → rechargement');
             await loadAllData();
         });
 
-        // Initialisation au chargement
+        // ─── Démarrage ────────────────────────────────────────────────────────
         loadAllData();
     </script>
 </body>
