@@ -116,8 +116,8 @@
         // ⚠️  IMPORTANT : si les noms ci-dessous ne correspondent pas, adaptez-les
         // Pour trouver le vrai nom : dans Grist, cliquez sur "..." de la table → Rename
         // Le nom interne (Table ID) est celui à utiliser ici (souvent sans accents)
-        const TABLE_ENTITES        = 'ENTITES';          // était 'ENTITÉS' → accent retiré
-        const TABLE_RELATIONS      = 'RELATIONS';
+        const TABLE_ENTITES         = 'ENTITES';
+        const TABLE_RELATIONS       = 'Relations';        // R minuscule !
         const TABLE_TYPES_RELATIONS = 'TYPES_RELATIONS';
 
         // ─── Couleurs par type d'entité (liste de choix) ───────────────────────
@@ -162,38 +162,30 @@
                     id,
                     Nom:         entitiesData.Nom?.[idx]          || '',
                     Sigle:       entitiesData.Sigle?.[idx]         || '',
-                    Type:        entitiesData.Type?.[idx]          || '',   // texte direct (Choice)
+                    Type:        (entitiesData.Type_?.[idx] || [])[0] || '',  // ChoiceList → tableau, on prend [0]
                     Description: entitiesData.Description?.[idx]   || '',
                     Responsable: entitiesData.Responsable?.[idx]   || '',
                     Actif:       entitiesData.Actif?.[idx] !== false
                 }));
 
-                // ── RELATIONS ──
-                // Source et Cible sont des colonnes Reference → Grist renvoie l'ID de la ligne référencée
-                // Type est aussi une Reference → Grist renvoie un ID numérique
-                // Validé et Intensité peuvent avoir des accents dans le nom de colonne → on cherche avec fallback
-                const valideKey   = Object.keys(relationsData).find(k => k.startsWith('Valid')) || 'Valide';
-                const intensiteKey = Object.keys(relationsData).find(k => k.startsWith('Intensit')) || 'Intensite';
-
+                // Colonnes avec underscore final (noms réservés dans Grist)
                 allRelations = relationsData.id.map((id, idx) => ({
                     id,
-                    Source:         relationsData.Source?.[idx],
-                    Cible:          relationsData.Cible?.[idx],
-                    Type:           relationsData.Type?.[idx],           // ID numérique → sera résolu via relationTypes
-                    Intensite:      relationsData[intensiteKey]?.[idx]  || 'Moyenne',
+                    Source:         relationsData.Source_?.[idx],
+                    Cible:          relationsData.Cible_?.[idx],
+                    Type:           relationsData.Type_?.[idx],
+                    Intensite:      relationsData.Intensite?.[idx]      || 'Moyenne',
                     Bidirectionnel: relationsData.Bidirectionnel?.[idx] || false,
                     Commentaire:    relationsData.Commentaire?.[idx]    || '',
-                    Valide:         relationsData[valideKey]?.[idx] !== false
+                    Valide:         relationsData.Valide?.[idx] !== false
                 }));
 
                 // ── TYPES_RELATIONS ──
-                const epaisseurKey = Object.keys(typesData).find(k => k.startsWith('Epaisseur') || k.startsWith('Épaisseur')) || 'Epaisseur';
-
                 relationTypes = typesData.id.map((id, idx) => ({
                     id,
-                    Nom:      typesData.Nom?.[idx]              || '',
-                    Couleur:  typesData.Couleur?.[idx]          || '#95A5A6',
-                    Epaisseur: typesData[epaisseurKey]?.[idx]   || 1
+                    Nom:       typesData.Nom_?.[idx]       || '',
+                    Couleur:   typesData.Couleur_?.[idx]   || '#95A5A6',
+                    Epaisseur: typesData.Epaisseur_?.[idx] || 1
                 }));
 
                 log(`✅ Chargé: ${allEntities.length} entités, ${allRelations.length} relations, ${relationTypes.length} types`);
