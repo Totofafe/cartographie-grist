@@ -339,8 +339,8 @@
             return typeLabels[type] || type;
         }
 
-        // ═══════════════════════════════════════════════════════════════════════
-        // Debug
+                // ═══════════════════════════════════════════════════════════════════════
+        // Debug amélioré
         // ═══════════════════════════════════════════════════════════════════════
         const dbg = document.getElementById('debug');
         
@@ -351,8 +351,7 @@
             ).join(' ');
             
             const className = type === 'error' ? 'debug-error' : 
-                            type === 'success' ? 'debug-success' :
-                            type === 'warning' ? 'debug-warning' :
+                            type === 'success' ? 'debug-success' : 
                             'debug-info';
             
             dbg.innerHTML += `<div class="${className}">${line}</div>`;
@@ -360,15 +359,23 @@
         }
         
         function toggleDebug() { 
-            if (dbg.style.display === 'none') {
+            if (dbg.style.display === 'none' || dbg.style.display === '') {
                 dbg.style.display = 'block';
-                if (!dataLoaded) {
-                    log('info', '⏳ Attendez que les données se chargent...');
-                }
             } else {
                 dbg.style.display = 'none';
             }
         }
+        
+        function clearDebug() {
+            dbg.innerHTML = '';
+        }
+        
+        // Fermer avec Échap
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && dbg.style.display === 'block') {
+                toggleDebug();
+            }
+        });
 
         // ═══════════════════════════════════════════════════════════════════════
         // Helper pour accéder aux colonnes
