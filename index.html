@@ -682,22 +682,22 @@
         // ═══════════════════════════════════════════════════════════════════════
         function populateFilters() {
             // NOUVEAU : Filtre entité spécifique
-const entitySelect = document.getElementById('filterEntity');
-entitySelect.innerHTML = '<option value="all">Toutes</option>';
-
-[...entityTypes].sort((a, b) => {
-    // Trier par le label (nom complet) et non par le code
-    const labelA = getTypeLabel(a);
-    const labelB = getTypeLabel(b);
-    return labelA.localeCompare(labelB, 'fr');
-}).forEach(type => {
-    const count = allEntities.filter(e => e.Type === type).length;
-    const label = getTypeLabel(type);
-    const opt = document.createElement('option');
-    opt.value = type;
-    opt.textContent = `${label} (${count})`;
-    entitySelect.appendChild(opt);
-});
+            const specificEntitySelect = document.getElementById('filterSpecificEntity');
+            specificEntitySelect.innerHTML = '<option value="all">Vue complète</option>';
+            
+            const sortedEntities = [...allEntities].sort((a, b) => 
+                (a.Nom || '').localeCompare(b.Nom || '')
+            );
+            
+            sortedEntities.forEach(entity => {
+                const opt = document.createElement('option');
+                opt.value = entity.id;
+                const label = entity.Sigle ? 
+                    `${entity.Sigle} - ${entity.Nom}` : 
+                    entity.Nom;
+                opt.textContent = label;
+                specificEntitySelect.appendChild(opt);
+            });
             
             specificEntitySelect.addEventListener('change', function() {
                 const depthControl = document.getElementById('depthControl');
