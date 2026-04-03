@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cartographie Relationnelle</title>
+    <title>Cartographie Relationnelle - Phase 1</title>
     <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
     <script src="https://unpkg.com/vis-network@9.1.9/standalone/umd/vis-network.min.js"></script>
     <style>
@@ -25,7 +25,7 @@
             padding: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-            max-width: 280px;
+            max-width: 300px;
         }
         #controls h3 {
             margin: 0 0 10px 0;
@@ -71,12 +71,23 @@
         #controls button.debug-btn:hover {
             background: #555;
         }
+        .control-section {
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid #e8e8e8;
+        }
+        .control-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
         #mynetwork {
             width: 100vw;
             height: 100vh;
             background: #f8f9fa;
         }
-        /* BLOC INFO UNIQUE (Légende + Stats fusionnées) */
         #info-panel {
             position: absolute;
             top: 10px;
@@ -85,7 +96,7 @@
             padding: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-            max-width: 280px;
+            max-width: 300px;
             max-height: calc(100vh - 20px);
             overflow-y: auto;
             z-index: 1000;
@@ -142,6 +153,19 @@
             font-size: 11px;
             color: #999;
         }
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            background: #e8e8e8;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+        .badge.new {
+            background: #3498db;
+            color: white;
+        }
         #loading {
             position: absolute;
             top: 50%;
@@ -191,33 +215,15 @@
             white-space: pre-wrap;
             word-break: break-word;
         }
-        .debug-error {
-            color: #ff6b6b;
-        }
-        .debug-success {
-            color: #51cf66;
-        }
-        .debug-info {
-            color: #74c0fc;
-        }
-        .debug-warning {
-            color: #ffd43b;
-        }
-        /* Scrollbar personnalisée pour le panneau info */
-        #info-panel::-webkit-scrollbar {
-            width: 6px;
-        }
-        #info-panel::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 3px;
-        }
-        #info-panel::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 3px;
-        }
-        #info-panel::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
+        .debug-error { color: #ff6b6b; }
+        .debug-success { color: #51cf66; }
+        .debug-info { color: #74c0fc; }
+        .debug-warning { color: #ffd43b; }
+        
+        #info-panel::-webkit-scrollbar { width: 6px; }
+        #info-panel::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 3px; }
+        #info-panel::-webkit-scrollbar-thumb { background: #888; border-radius: 3px; }
+        #info-panel::-webkit-scrollbar-thumb:hover { background: #555; }
     </style>
 </head>
 <body>
@@ -227,35 +233,89 @@
     </div>
 
     <div id="controls">
-        <h3>🎛️ Filtres</h3>
+        <h3>🎛️ Contrôles</h3>
+        
+        <!-- Filtres de base -->
         <label>
             <input type="checkbox" id="showInactive">
             Afficher entités inactives
         </label>
+        
         <div style="margin-top: 10px;">
-            <label style="display: block; margin-bottom: 3px;">Type de relation :</label>
+            <label style="display: block; margin-bottom: 3px; font-size: 11px; font-weight: 600;">Type de relation :</label>
             <select id="filterRelation">
                 <option value="all">Toutes</option>
             </select>
         </div>
+        
         <div style="margin-top: 10px;">
-            <label style="display: block; margin-bottom: 3px;">Type d'entité :</label>
+            <label style="display: block; margin-bottom: 3px; font-size: 11px; font-weight: 600;">Type d'entité :</label>
             <select id="filterEntity">
                 <option value="all">Toutes</option>
             </select>
         </div>
+        
+        <!-- Section Layout (Phase 1) -->
+        <div class="control-section">
+            <div class="control-section-title">⚡ Layout par intensité <span class="badge new">Phase 1</span></div>
+            
+            <label>
+                <input type="checkbox" id="enableIntensityLayout" checked onchange="refreshGraph()">
+                Activer positionnement pondéré
+            </label>
+            
+            <label>
+                <input type="checkbox" id="showCentralitySize" checked onchange="refreshGraph()">
+                Taille selon centralité
+            </label>
+            
+            <div style="margin-top: 10px;">
+                <label style="display: block; margin-bottom: 3px; font-size: 11px;">Force des liens forts :</label>
+                <input type="range" id="strongLinkForce" min="50" max="150" value="80" 
+                       style="width: 100%;" onchange="updateForceLabel(); refreshGraph()">
+                <div style="font-size: 10px; color: #999; text-align: center;" id="strongLinkLabel">80px</div>
+            </div>
+            
+            <div style="margin-top: 10px;">
+                <label style="display: block; margin-bottom: 3px; font-size: 11px;">Force des liens faibles :</label>
+                <input type="range" id="weakLinkForce" min="150" max="400" value="250" 
+                       style="width: 100%;" onchange="updateForceLabel(); refreshGraph()">
+                <div style="font-size: 10px; color: #999; text-align: center;" id="weakLinkLabel">250px</div>
+            </div>
+        </div>
+        
+        <!-- Boutons d'action -->
         <button onclick="network && network.fit()">🎯 Recentrer</button>
+        <button onclick="resetPhysics()">🔄 Réinitialiser layout</button>
         <button onclick="exportImage()">📸 Exporter PNG</button>
         <button onclick="toggleDebug()" class="debug-btn">🐛 Debug</button>
     </div>
 
     <div id="mynetwork"></div>
 
-    <!-- PANNEAU INFO UNIQUE : Légende + Stats fusionnées -->
     <div id="info-panel">
         <h3>📊 Informations</h3>
         
-        <!-- Section Statistiques -->
+        <!-- Métriques réseau (Phase 1) -->
+        <div class="info-section" id="metrics-section">
+            <h4>Métriques du réseau <span class="badge new">Phase 1</span></h4>
+            <div id="metricsContent">
+                <div class="stats-row">
+                    <span>Densité :</span>
+                    <strong>—</strong>
+                </div>
+                <div class="stats-row">
+                    <span>Degré moyen :</span>
+                    <strong>—</strong>
+                </div>
+                <div class="stats-row">
+                    <span>Liens forts :</span>
+                    <strong>—</strong>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Statistiques -->
         <div class="info-section" id="stats-section">
             <h4>Statistiques</h4>
             <div id="statsContent">
@@ -270,13 +330,13 @@
             </div>
         </div>
 
-        <!-- Section Types d'entités -->
+        <!-- Types d'entités -->
         <div class="info-section" id="entities-section">
             <h4>Types d'entités</h4>
             <div id="entitiesLegend">Chargement...</div>
         </div>
 
-        <!-- Section Types de relations -->
+        <!-- Types de relations -->
         <div class="info-section" id="relations-section">
             <h4>Types de relations</h4>
             <div id="relationsLegend">Chargement...</div>
@@ -297,24 +357,24 @@
             },
             
             COLONNES: {
-                ENTITE_NOM:         'Nom',
-                ENTITE_SIGLE:       'Sigle',
-                ENTITE_TYPE:        'Type_',
-                ENTITE_DESC:        'Description',
-                ENTITE_RESP:        'Responsable',
-                ENTITE_ACTIF:       'Actif',
+                ENTITE_NOM:      'Nom',
+                ENTITE_SIGLE:    'Sigle',
+                ENTITE_TYPE:     'Type_',
+                ENTITE_DESC:     'Description',
+                ENTITE_RESP:     'Responsable',
+                ENTITE_ACTIF:    'Actif',
                 
-                REL_SOURCE:         'Source_',
-                REL_CIBLE:          'Cible_',
-                REL_TYPE:           'Type_',
-                REL_INTENSITE:      'Intensite',
-                REL_BIDIRECT:       'Bidirectionnel',
-                REL_COMMENT:        'Commentaire',
-                REL_VALIDE:         'Valide',
+                REL_SOURCE:      'Source_',
+                REL_CIBLE:       'Cible_',
+                REL_TYPE:        'Type_',
+                REL_INTENSITE:   'Intensite',
+                REL_BIDIRECT:    'Bidirectionnel',
+                REL_COMMENT:     'Commentaire',
+                REL_VALIDE:      'Valide',
                 
-                TYPE_NOM:           'Nom_',
-                TYPE_COULEUR:       'Couleur_',
-                TYPE_EPAISSEUR:     'Epaisseur_'
+                TYPE_NOM:        'Nom_',
+                TYPE_COULEUR:    'Couleur_',
+                TYPE_EPAISSEUR:  'Epaisseur_'
             }
         };
 
@@ -327,50 +387,105 @@
         let relationTypes = [];
         let entityTypes = new Set();
         let dataLoaded = false;
+        let centralityScores = {};
 
         const typeColors = {
-            'M': '#E74C3C',
-            'D': '#3498DB',
-            'SD': '#2ECC71',
-            'B': '#F39C12',
-            'S': '#9B59B6',
-            'P': '#1ABC9C',
-            'C': '#E67E22',
-            'U': '#16A085',
-            
-            'Mission': '#E74C3C',
-            'Direction': '#3498DB',
-            'Sous-direction': '#2ECC71',
-            'Bureau': '#F39C12',
-            'Service': '#9B59B6',
-            'Pôle': '#1ABC9C',
-            'Cellule': '#E67E22',
-            'Unité': '#16A085'
+            'M': '#E74C3C', 'D': '#3498DB', 'SD': '#2ECC71', 'B': '#F39C12',
+            'S': '#9B59B6', 'P': '#1ABC9C', 'C': '#E67E22', 'U': '#16A085',
+            'Mission': '#E74C3C', 'Direction': '#3498DB', 'Sous-direction': '#2ECC71',
+            'Bureau': '#F39C12', 'Service': '#9B59B6', 'Pôle': '#1ABC9C',
+            'Cellule': '#E67E22', 'Unité': '#16A085'
         };
 
         const typeLabels = {
-            'M': 'Mission',
-            'D': 'Direction',
-            'SD': 'Sous-direction',
-            'B': 'Bureau',
-            'S': 'Service',
-            'P': 'Pôle',
-            'C': 'Cellule',
-            'U': 'Unité'
+            'M': 'Mission', 'D': 'Direction', 'SD': 'Sous-direction', 'B': 'Bureau',
+            'S': 'Service', 'P': 'Pôle', 'C': 'Cellule', 'U': 'Unité'
         };
 
         function getTypeColor(type) {
-            const color = typeColors[type];
-            if (!color) {
-                console.warn(`⚠️ Type "${type}" sans couleur définie`);
-                log('warning', `⚠️ Type sans couleur: "${type}"`);
-                return '#95A5A6';
-            }
-            return color;
+            return typeColors[type] || '#95A5A6';
         }
 
         function getTypeLabel(type) {
             return typeLabels[type] || type;
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // PHASE 1 : Calcul de centralité
+        // ═══════════════════════════════════════════════════════════════════════
+        function calculateCentrality(entities, relations) {
+            const centrality = {};
+            
+            entities.forEach(e => {
+                const outgoing = relations.filter(r => r.Source === e.id);
+                const incoming = relations.filter(r => r.Cible === e.id);
+                
+                // Pondération par intensité
+                const weightedScore = [...outgoing, ...incoming].reduce((sum, r) => {
+                    const weight = r.Intensité === 'Forte' ? 3 : 
+                                  r.Intensité === 'Moyenne' ? 2 : 1;
+                    return sum + weight;
+                }, 0);
+                
+                centrality[e.id] = {
+                    score: weightedScore,
+                    degree: outgoing.length + incoming.length,
+                    weighted: weightedScore
+                };
+            });
+            
+            // Normaliser entre 0 et 1
+            const maxScore = Math.max(...Object.values(centrality).map(c => c.score), 1);
+            Object.keys(centrality).forEach(id => {
+                centrality[id].normalized = centrality[id].score / maxScore;
+            });
+            
+            log('info', `🎯 Centralité calculée pour ${Object.keys(centrality).length} entités`);
+            
+            return centrality;
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // PHASE 1 : Métriques du réseau
+        // ═══════════════════════════════════════════════════════════════════════
+        function calculateNetworkMetrics(entities, relations) {
+            const n = entities.length;
+            const m = relations.length;
+            
+            // Densité : nombre de liens réels / nombre de liens possibles
+            const maxLinks = n * (n - 1);
+            const density = maxLinks > 0 ? m / maxLinks : 0;
+            
+            // Degré moyen
+            const avgDegree = n > 0 ? (m * 2) / n : 0;
+            
+            // Comptage par intensité
+            const strongLinks = relations.filter(r => r.Intensité === 'Forte').length;
+            const mediumLinks = relations.filter(r => r.Intensité === 'Moyenne').length;
+            const weakLinks = relations.filter(r => r.Intensité === 'Faible').length;
+            
+            // Entité la plus connectée
+            let maxConnected = null;
+            let maxConnections = 0;
+            
+            if (Object.keys(centralityScores).length > 0) {
+                Object.entries(centralityScores).forEach(([id, data]) => {
+                    if (data.degree > maxConnections) {
+                        maxConnections = data.degree;
+                        maxConnected = entities.find(e => e.id === parseInt(id));
+                    }
+                });
+            }
+            
+            return {
+                density,
+                avgDegree,
+                strongLinks,
+                mediumLinks,
+                weakLinks,
+                maxConnected,
+                maxConnections
+            };
         }
 
         // ═══════════════════════════════════════════════════════════════════════
@@ -383,26 +498,13 @@
             const line = args.map(a => 
                 typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a)
             ).join(' ');
-            
-            const className = type === 'error' ? 'debug-error' : 
-                            type === 'success' ? 'debug-success' :
-                            type === 'warning' ? 'debug-warning' :
-                            'debug-info';
-            
+            const className = `debug-${type}`;
             dbg.innerHTML += `<div class="${className}">${line}</div>`;
             dbg.scrollTop = dbg.scrollHeight;
         }
         
         function toggleDebug() { 
-            if (dbg.style.display === 'none' || dbg.style.display === '') {
-                dbg.style.display = 'block';
-            } else {
-                dbg.style.display = 'none';
-            }
-        }
-        
-        function clearDebug() {
-            dbg.innerHTML = '';
+            dbg.style.display = dbg.style.display === 'none' || dbg.style.display === '' ? 'block' : 'none';
         }
         
         document.addEventListener('keydown', function(event) {
@@ -411,14 +513,19 @@
             }
         });
 
+        function updateForceLabel() {
+            document.getElementById('strongLinkLabel').textContent = 
+                document.getElementById('strongLinkForce').value + 'px';
+            document.getElementById('weakLinkLabel').textContent = 
+                document.getElementById('weakLinkForce').value + 'px';
+        }
+
         // ═══════════════════════════════════════════════════════════════════════
         // Helper
         // ═══════════════════════════════════════════════════════════════════════
         function getColumn(data, colName, idx) {
             const value = data[colName]?.[idx] ?? data[colName + '_']?.[idx];
-            if (Array.isArray(value)) {
-                return value[0] || '';
-            }
+            if (Array.isArray(value)) return value[0] || '';
             return value;
         }
 
@@ -435,15 +542,13 @@
         // ═══════════════════════════════════════════════════════════════════════
         async function loadAllData() {
             try {
-                log('info', '🔄 Début du chargement...');
+                log('info', '🔄 Phase 1: Chargement...');
 
                 const [entitiesData, relationsData, typesData] = await Promise.all([
                     grist.docApi.fetchTable(CONFIG.TABLES.ENTITES),
                     grist.docApi.fetchTable(CONFIG.TABLES.RELATIONS),
                     grist.docApi.fetchTable(CONFIG.TABLES.TYPES_RELATIONS)
                 ]);
-
-                log('success', '✓ Tables chargées');
 
                 if (!entitiesData.id || entitiesData.id.length === 0) {
                     throw new Error(`Table ${CONFIG.TABLES.ENTITES} est vide`);
@@ -477,44 +582,28 @@
                     Épaisseur: getColumn(typesData, CONFIG.COLONNES.TYPE_EPAISSEUR, idx) || 1
                 }));
 
-                log('success', `✅ ${allEntities.length} entités, ${allRelations.length} relations, ${relationTypes.length} types`);
+                log('success', `✅ ${allEntities.length} entités, ${allRelations.length} relations`);
 
                 entityTypes = new Set(allEntities.map(e => e.Type).filter(Boolean));
                 
                 dataLoaded = true;
                 populateFilters();
-                runDiagnostics();
                 refreshGraph();
                 document.getElementById('loading').classList.add('hidden');
 
-                log('success', '✅ Chargement terminé');
+                log('success', '✅ Phase 1 initialisée');
 
             } catch (error) {
                 console.error('❌ Erreur:', error);
-                log('error', `❌ ERREUR: ${error.message}`);
+                log('error', `❌ ${error.message}`);
                 document.getElementById('loading').innerHTML = `
-                    <div style="color: #e74c3c; max-width: 500px;">
+                    <div style="color: #e74c3c; max-width: 500px; padding: 20px;">
                         <strong>⚠️ Erreur de chargement</strong><br><br>
-                        <div style="text-align: left; font-size: 12px; background: #f8f9fa; padding: 10px; border-radius: 4px;">
-                            ${error.message}
-                        </div>
+                        ${error.message}
                     </div>
                 `;
                 dbg.style.display = 'block';
             }
-        }
-
-        // ═══════════════════════════════════════════════════════════════════════
-        // Diagnostic
-        // ═══════════════════════════════════════════════════════════════════════
-        function runDiagnostics() {
-            log('info', '\n════════════════════════════════════════');
-            log('info', '🔍 DIAGNOSTIC');
-            log('info', '════════════════════════════════════════');
-            log('info', `\n📊 ENTITÉS: ${allEntities.length} total`);
-            log('info', `🔗 RELATIONS: ${allRelations.length} total`);
-            log('info', `🏷️ TYPES RELATIONS: ${relationTypes.length} total`);
-            log('info', '\n════════════════════════════════════════');
         }
 
         // ═══════════════════════════════════════════════════════════════════════
@@ -549,7 +638,7 @@
         }
 
         // ═══════════════════════════════════════════════════════════════════════
-        // Rendu
+        // PHASE 1 : Rendu avec positionnement pondéré
         // ═══════════════════════════════════════════════════════════════════════
         function refreshGraph() {
             if (!dataLoaded || allEntities.length === 0) {
@@ -557,10 +646,17 @@
                 return;
             }
 
+            log('info', '\n🔄 Refresh du graphe (Phase 1)...');
+
             const showInactive = document.getElementById('showInactive').checked;
             const filterRel = document.getElementById('filterRelation').value;
             const filterEnt = document.getElementById('filterEntity').value;
+            const enableIntensity = document.getElementById('enableIntensityLayout').checked;
+            const showCentrality = document.getElementById('showCentralitySize').checked;
+            const strongForce = parseInt(document.getElementById('strongLinkForce').value);
+            const weakForce = parseInt(document.getElementById('weakLinkForce').value);
 
+            // Filtrer entités
             const filteredEntities = allEntities.filter(e => {
                 if (!showInactive && !e.Actif) return false;
                 if (filterEnt !== 'all' && e.Type !== filterEnt) return false;
@@ -569,37 +665,81 @@
 
             const entityIds = new Set(filteredEntities.map(e => e.id));
 
+            // Filtrer relations
             const filteredRelations = allRelations.filter(r => {
                 if (!r.Validé) return false;
                 if (filterRel !== 'all' && r.Type !== parseInt(filterRel)) return false;
                 return entityIds.has(r.Source) && entityIds.has(r.Cible);
             });
 
-            log('info', `🔍 ${filteredEntities.length} entités, ${filteredRelations.length} relations`);
+            log('info', `📊 ${filteredEntities.length} entités, ${filteredRelations.length} relations`);
 
+            // ─── PHASE 1 : Calculer centralité ─────────────────────────────────
+            centralityScores = calculateCentrality(filteredEntities, filteredRelations);
+
+            // ─── PHASE 1 : Créer les nœuds avec taille variable ────────────────
             const nodes = filteredEntities.map(e => {
                 const color = getTypeColor(e.Type);
                 const label = e.Sigle || e.Nom;
                 const typeLabel = getTypeLabel(e.Type);
                 
+                // Taille basée sur centralité
+                const centrality = centralityScores[e.id]?.normalized || 0;
+                const baseSize = 20;
+                const nodeSize = showCentrality ? baseSize + (centrality * 30) : baseSize;
+                
                 return {
                     id: e.id,
                     label: label,
-                    title: `<b>${e.Nom}</b><br>Type: ${typeLabel}<br>Responsable: ${e.Responsable || 'N/A'}${e.Description ? '<br><br>' + e.Description : ''}`,
+                    title: `<b>${e.Nom}</b><br>Type: ${typeLabel}<br>Responsable: ${e.Responsable || 'N/A'}<br><br>` +
+                           `<b>Centralité:</b> ${(centrality * 100).toFixed(0)}%<br>` +
+                           `<b>Degré:</b> ${centralityScores[e.id]?.degree || 0}<br>` +
+                           `<b>Score pondéré:</b> ${centralityScores[e.id]?.weighted || 0}` +
+                           (e.Description ? '<br><br>' + e.Description : ''),
                     color: e.Actif ? color : '#CCCCCC',
                     shape: e.Type === 'D' || e.Type === 'Direction' ? 'box' : 'ellipse',
+                    size: nodeSize,
+                    value: centrality * 100,
                     font: { 
-                        size: (e.Type === 'D' || e.Type === 'Direction') ? 16 : 12,
-                        bold: (e.Type === 'D' || e.Type === 'Direction'),
+                        size: Math.max(12, 12 + centrality * 6),
+                        bold: (e.Type === 'D' || e.Type === 'Direction') || centrality > 0.7,
                         color: e.Actif ? '#000000' : '#999999'
                     },
-                    borderWidth: e.Actif ? 2 : 1,
+                    borderWidth: e.Actif ? 2 + Math.floor(centrality * 2) : 1,
                     opacity: e.Actif ? 1 : 0.5
                 };
             });
 
+            // ─── PHASE 1 : Créer les liens avec longueur pondérée ──────────────
             const edges = filteredRelations.map(r => {
                 const relType = relationTypes.find(t => t.id === r.Type) || {};
+                
+                // ⚡ PHASE 1 : Longueur selon intensité
+                let springLength, springConstant;
+                
+                if (enableIntensity) {
+                    switch(r.Intensité) {
+                        case 'Forte':
+                            springLength = strongForce;
+                            springConstant = 0.08;
+                            break;
+                        case 'Moyenne':
+                            springLength = 150;
+                            springConstant = 0.04;
+                            break;
+                        case 'Faible':
+                            springLength = weakForce;
+                            springConstant = 0.02;
+                            break;
+                        default:
+                            springLength = 150;
+                            springConstant = 0.04;
+                    }
+                } else {
+                    springLength = 150;
+                    springConstant = 0.04;
+                }
+                
                 return {
                     from: r.Source,
                     to: r.Cible,
@@ -607,44 +747,100 @@
                     color: { color: relType.Couleur || '#95A5A6' },
                     width: relType.Épaisseur || 1,
                     arrows: r.Bidirectionnel ? 'to, from' : 'to',
-                    title: `${relType.Nom || 'Relation'}<br>Intensité: ${r.Intensité}${r.Commentaire ? '<br><br>' + r.Commentaire : ''}`,
-                    dashes: r.Intensité === 'Faible'
+                    title: `${relType.Nom || 'Relation'}<br>Intensité: ${r.Intensité}<br>Longueur: ${springLength}px${r.Commentaire ? '<br><br>' + r.Commentaire : ''}`,
+                    dashes: r.Intensité === 'Faible',
+                    length: springLength,
+                    smooth: {
+                        type: 'continuous',
+                        roundness: r.Intensité === 'Forte' ? 0.2 : 0.5
+                    }
                 };
             });
 
+            // ─── PHASE 1 : Options de physique optimisées ──────────────────────
             const options = {
-                nodes: { borderWidth: 2, borderWidthSelected: 4, shadow: true },
-                edges: { smooth: { type: 'continuous', roundness: 0.5 }, shadow: true },
+                nodes: {
+                    borderWidth: 2,
+                    borderWidthSelected: 4,
+                    shadow: true,
+                    scaling: {
+                        min: 10,
+                        max: 40,
+                        label: {
+                            enabled: true,
+                            min: 12,
+                            max: 18
+                        }
+                    }
+                },
+                edges: {
+                    smooth: {
+                        type: 'continuous',
+                        roundness: 0.5
+                    },
+                    shadow: true
+                },
                 physics: {
                     enabled: true,
                     barnesHut: {
-                        gravitationalConstant: -3000,
-                        centralGravity: 0.3,
+                        gravitationalConstant: -2500,
+                        centralGravity: 0.15,
                         springLength: 150,
                         springConstant: 0.04,
-                        damping: 0.09
+                        damping: 0.09,
+                        avoidOverlap: 0.5
                     },
-                    stabilization: { iterations: 250 }
+                    stabilization: {
+                        enabled: true,
+                        iterations: 300,
+                        updateInterval: 25,
+                        fit: true
+                    },
+                    solver: 'barnesHut',
+                    timestep: 0.5
                 },
-                interaction: { hover: true, tooltipDelay: 200, navigationButtons: true, keyboard: true }
+                interaction: {
+                    hover: true,
+                    tooltipDelay: 200,
+                    navigationButtons: true,
+                    keyboard: true,
+                    dragView: true,
+                    zoomView: true
+                },
+                layout: {
+                    improvedLayout: true,
+                    hierarchical: false
+                }
             };
 
+            // Créer ou mettre à jour le réseau
             const container = document.getElementById('mynetwork');
             const data = { nodes: nodes, edges: edges };
 
             if (network) {
+                log('info', '🔄 Mise à jour du réseau existant');
                 network.setData(data);
+                network.setOptions(options);
             } else {
+                log('info', '🆕 Création du réseau');
                 network = new vis.Network(container, data, options);
                 
                 network.on('selectNode', function(params) {
                     const entity = allEntities.find(e => e.id === params.nodes[0]);
-                    log('info', `Nœud: ${entity?.Nom || params.nodes[0]}`);
+                    const centrality = centralityScores[params.nodes[0]];
+                    log('info', `📍 Sélection: ${entity?.Nom || params.nodes[0]} (centralité: ${(centrality?.normalized * 100).toFixed(0)}%)`);
                 });
 
                 network.on('stabilizationIterationsDone', function() {
                     log('success', '✅ Stabilisation terminée');
                     network.setOptions({ physics: false });
+                });
+
+                network.on('stabilizationProgress', function(params) {
+                    const progress = Math.round((params.iterations / params.total) * 100);
+                    if (progress % 20 === 0) {
+                        log('info', `⏳ Stabilisation: ${progress}%`);
+                    }
                 });
             }
 
@@ -652,9 +848,40 @@
         }
 
         // ═══════════════════════════════════════════════════════════════════════
-        // Mise à jour du panneau info unifié
+        // PHASE 1 : Mise à jour panneau info avec métriques
         // ═══════════════════════════════════════════════════════════════════════
         function updateInfoPanel(filteredEntities, filteredRelations) {
+            const metrics = calculateNetworkMetrics(filteredEntities, filteredRelations);
+
+            // MÉTRIQUES
+            document.getElementById('metricsContent').innerHTML = `
+                <div class="stats-row">
+                    <span>Densité :</span>
+                    <strong>${(metrics.density * 100).toFixed(1)}%</strong>
+                </div>
+                <div class="stats-row">
+                    <span>Degré moyen :</span>
+                    <strong>${metrics.avgDegree.toFixed(1)}</strong>
+                </div>
+                <div class="stats-row">
+                    <span>Liens forts :</span>
+                    <strong>${metrics.strongLinks}</strong>
+                </div>
+                <div class="stats-row">
+                    <span>Liens moyens :</span>
+                    <strong>${metrics.mediumLinks}</strong>
+                </div>
+                <div class="stats-row">
+                    <span>Liens faibles :</span>
+                    <strong>${metrics.weakLinks}</strong>
+                </div>
+                ${metrics.maxConnected ? `
+                <div class="stats-total">
+                    Plus connecté : <strong>${metrics.maxConnected.Nom}</strong> (${metrics.maxConnections} liens)
+                </div>
+                ` : ''}
+            `;
+
             // STATS
             document.getElementById('statsContent').innerHTML = `
                 <div class="stats-row">
@@ -665,9 +892,12 @@
                     <span>Relations affichées :</span>
                     <strong>${filteredRelations.length}</strong>
                 </div>
+                <div class="stats-total">
+                    Total : ${allEntities.length} entités, ${allRelations.length} relations
+                </div>
             `;
 
-            // LÉGENDE ENTITÉS
+            // LÉGENDES
             const usedTypes = new Set(allEntities.map(e => e.Type).filter(Boolean));
             let entitiesHTML = '';
             [...usedTypes].sort().forEach(type => {
@@ -683,7 +913,6 @@
             });
             document.getElementById('entitiesLegend').innerHTML = entitiesHTML || '<em style="color: #999; font-size: 11px;">Aucune donnée</em>';
 
-            // LÉGENDE RELATIONS
             let relationsHTML = '';
             relationTypes.forEach(type => {
                 const count = allRelations.filter(r => r.Type === type.id).length;
@@ -699,30 +928,41 @@
             document.getElementById('relationsLegend').innerHTML = relationsHTML || '<em style="color: #999; font-size: 11px;">Aucune donnée</em>';
         }
 
+        function resetPhysics() {
+            if (network) {
+                log('info', '🔄 Réinitialisation de la physique');
+                network.setOptions({ physics: { enabled: true } });
+                network.stabilize();
+                setTimeout(() => {
+                    network.setOptions({ physics: { enabled: false } });
+                    log('success', '✅ Layout réinitialisé');
+                }, 3000);
+            }
+        }
+
         function exportImage() {
             if (!network) return;
             const canvas = document.querySelector('#mynetwork canvas');
             const link = document.createElement('a');
             const date = new Date().toISOString().split('T')[0];
-            link.download = `cartographie_${date}.png`;
+            link.download = `cartographie_phase1_${date}.png`;
             link.href = canvas.toDataURL('image/png');
             link.click();
-            log('success', `📸 Image exportée: cartographie_${date}.png`);
+            log('success', `📸 Image exportée: cartographie_phase1_${date}.png`);
         }
 
         // ═══════════════════════════════════════════════════════════════════════
-        // Réaction aux changements
+        // Événements
         // ═══════════════════════════════════════════════════════════════════════
         grist.onRecords(async function(records) {
             if (dataLoaded) {
-                log('info', '🔔 Mise à jour détectée');
+                log('info', '🔔 Mise à jour Grist détectée');
                 await loadAllData();
             }
         });
 
-        // ═══════════════════════════════════════════════════════════════════════
-        // Démarrage
-        // ═══════════════════════════════════════════════════════════════════════
+        // Initialisation
+        updateForceLabel();
         loadAllData();
     </script>
 </body>
