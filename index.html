@@ -686,7 +686,7 @@
             specificEntitySelect.innerHTML = '<option value="all">Vue complète</option>';
             
             const sortedEntities = [...allEntities].sort((a, b) => 
-                (a.Nom || '').localeCompare(b.Nom || '')
+                (a.Sigle || '').localeCompare(b.Sigle || '')
             );
             
             sortedEntities.forEach(entity => {
