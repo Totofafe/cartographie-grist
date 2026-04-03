@@ -722,7 +722,11 @@
             // Types d'entités
             const entitySelect = document.getElementById('filterEntity');
             entitySelect.innerHTML = '<option value="all">Toutes</option>';
-            [...entityTypes].sort().forEach(type => {
+            [...entityTypes].sort((a, b) => {
+    const labelA = getTypeLabel(a);
+    const labelB = getTypeLabel(b);
+    return labelA.localeCompare(labelB, 'fr');
+}).forEach(type => {
                 const count = allEntities.filter(e => e.Type === type).length;
                 const label = getTypeLabel(type);
                 const opt = document.createElement('option');
@@ -803,7 +807,7 @@
                            `<b>Score pondéré:</b> ${centralityScores[e.id]?.weighted || 0}` +
                            (e.Description ? '<br><br>' + e.Description : ''),
                     color: e.Actif ? color : '#CCCCCC',
-                    shape: isSelected ? 'star' : (e.Type === 'D' || e.Type === 'Direction' ? 'box' : 'ellipse'),
+                    shape: e.Type === 'D' || e.Type === 'Direction' ? 'box' : 'ellipse',
                     size: isSelected ? nodeSize + 10 : nodeSize,
                     value: centrality * 100,
                     font: { 
