@@ -290,13 +290,15 @@
         // TOOLTIP PERSONNALISÉ
         // ═══════════════════════════════════════════════════════════════════════
         const tooltipEl = document.getElementById('custom-tooltip');
-        tooltipEl.addEventListener('mouseenter', function() { tooltipHovered = true; });
-        tooltipEl.addEventListener('mouseleave', function() { tooltipHovered = false; });
-        // Empêcher le clic sur le tooltip de remonter vers le canvas
-        tooltipEl.addEventListener('click', function(e) { e.stopPropagation(); });
         let tooltipVisible = false;
         let tooltipPinned  = false;
         let tooltipHovered = false;
+
+        // Le tooltip est interactif : on track si la souris est dessus
+        tooltipEl.addEventListener('mouseenter', function() { tooltipHovered = true; });
+        tooltipEl.addEventListener('mouseleave', function() { tooltipHovered = false; });
+        // Empêcher le clic sur le tooltip de remonter au canvas
+        tooltipEl.addEventListener('click', function(e) { e.stopPropagation(); });
 
         function showTooltip(x, y, html) {
             tooltipEl.innerHTML = html;
@@ -309,6 +311,7 @@
             tooltipEl.style.display = 'none';
             tooltipVisible = false;
             tooltipPinned  = false;
+            tooltipHovered = false;
         }
 
         function positionTooltip(x, y) {
@@ -788,7 +791,6 @@
                 layout: { improvedLayout: true, hierarchical: false }
             };
 
-            // interaction définie une seule fois à la création, jamais réécrasée par setOptions
             const interactionOptions = {
                 hover: true,
                 tooltipDelay: 99999,
@@ -807,27 +809,26 @@
             } else {
                 network = new vis.Network(container, data, { ...options, interaction: interactionOptions });
 
-                // Survol nœud → affiche tooltip flottant
                 network.on('hoverNode', function (params) {
                     if (tooltipPinned) return;
                     const entity = allEntities.find(e => e.id === params.node);
                     if (!entity) return;
                     showTooltip(params.pointer.DOM.x, params.pointer.DOM.y, buildNodeTooltip(entity));
                 });
-                // Quitter nœud → masque seulement si pas pinné
-                network.on('blurNode', function() { if (!tooltipPinned && !tooltipHovered) hideTooltip(); });
+                network.on('blurNode', function() {
+                    if (!tooltipPinned && !tooltipHovered) hideTooltip();
+                });
 
-                // Survol arête → affiche tooltip flottant
                 network.on('hoverEdge', function (params) {
                     if (tooltipPinned) return;
                     const relation = allRelations.find(r => r.id === params.edge);
                     if (!relation) return;
                     showTooltip(params.pointer.DOM.x, params.pointer.DOM.y, buildEdgeTooltip(relation));
                 });
-                // Quitter arête → masque seulement si pas pinné
-                network.on('blurEdge', function() { if (!tooltipPinned && !tooltipHovered) hideTooltip(); });
+                network.on('blurEdge', function() {
+                    if (!tooltipPinned && !tooltipHovered) hideTooltip();
+                });
 
-                // Clic sur nœud → fixe le tooltip
                 network.on('click', function (params) {
                     if (params.nodes.length > 0) {
                         const entity = allEntities.find(e => e.id === params.nodes[0]);
@@ -840,7 +841,6 @@
                         showTooltip(params.pointer.DOM.x, params.pointer.DOM.y, buildEdgeTooltip(relation));
                         tooltipPinned = true;
                     } else {
-                        // Clic sur le fond → dépinne et ferme
                         hideTooltip();
                     }
                 });
