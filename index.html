@@ -86,15 +86,22 @@
         .debug-success { color: #51cf66; }
         .debug-info { color: #74c0fc; }
         .debug-warning { color: #ffd43b; }
-
+ 
         /* ═══════════════════════════════════════════════════
            TOOLTIP PERSONNALISÉ
         ═══════════════════════════════════════════════════ */
         #custom-tooltip {
-            position: fixed; z-index: 9999; pointer-events: none;
+            position: fixed; z-index: 9999; pointer-events: auto;
             display: none; max-width: 280px;
             filter: drop-shadow(0 4px 12px rgba(0,0,0,0.2));
         }
+        #tooltip-close {
+            position: absolute; top: 6px; right: 8px;
+            cursor: pointer; font-size: 14px; color: rgba(255,255,255,0.8);
+            line-height: 1; font-weight: bold; z-index: 1;
+            background: none; border: none; padding: 0;
+        }
+        #tooltip-close:hover { color: white; }
         .tooltip-node { background: white; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; }
         .tooltip-header { padding: 10px 14px; color: white; }
         .tooltip-header .tooltip-nom { font-size: 14px; font-weight: 700; line-height: 1.3; }
@@ -117,7 +124,7 @@
         .intensite-forte   { background: #e74c3c; }
         .intensite-moyenne { background: #f39c12; }
         .intensite-faible  { background: #95a5a6; }
-
+ 
         #info-panel::-webkit-scrollbar, #controls::-webkit-scrollbar { width: 6px; }
         #info-panel::-webkit-scrollbar-track, #controls::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 3px; }
         #info-panel::-webkit-scrollbar-thumb, #controls::-webkit-scrollbar-thumb { background: #888; border-radius: 3px; }
@@ -128,10 +135,10 @@
         <div class="spinner"></div>
         <div>Chargement des données...</div>
     </div>
-
+ 
     <div id="controls">
         <h3>🎛️ Contrôles</h3>
-
+ 
         <!-- Filtre entité spécifique -->
         <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 2px solid #3498db;">
             <label style="display: block; margin-bottom: 3px; font-size: 11px; font-weight: 600;">🎯 Centrer sur une entité :</label>
@@ -148,22 +155,22 @@
                 </select>
             </div>
         </div>
-
+ 
         <label>
             <input type="checkbox" id="showInactive">
             Afficher entités inactives
         </label>
-
+ 
         <div style="margin-top: 10px;">
             <label style="display: block; margin-bottom: 3px; font-size: 11px; font-weight: 600;">Type de relation :</label>
             <select id="filterRelation"><option value="all">Toutes</option></select>
         </div>
-
+ 
         <div style="margin-top: 10px;">
             <label style="display: block; margin-bottom: 3px; font-size: 11px; font-weight: 600;">Type d'entité :</label>
             <select id="filterEntity"><option value="all">Toutes</option></select>
         </div>
-
+ 
         <!-- Layout Phase 1 -->
         <div class="control-section">
             <div class="control-section-title">⚡ Layout par intensité <span class="badge new">Phase 1</span></div>
@@ -188,16 +195,16 @@
                 <div style="font-size: 10px; color: #999; text-align: center;" id="weakLinkLabel">250px</div>
             </div>
         </div>
-
+ 
         <button onclick="network && network.fit()">🎯 Recentrer</button>
         <button onclick="resetPhysics()">🔄 Réinitialiser layout</button>
         <button onclick="resetFilters()" class="reset-btn">↺ Réinitialiser filtres</button>
         <button onclick="exportImage()">📸 Exporter PNG</button>
         <button onclick="toggleDebug()" class="debug-btn">🐛 Debug</button>
     </div>
-
+ 
     <div id="mynetwork"></div>
-
+ 
     <div id="info-panel">
         <h3>📊 Informations</h3>
         <div class="info-section">
@@ -224,10 +231,10 @@
             <div id="relationsLegend">Chargement...</div>
         </div>
     </div>
-
+ 
     <div id="custom-tooltip"></div>
     <div id="debug"></div>
-
+ 
     <script>
         // ═══════════════════════════════════════════════════════════════════════
         // CONFIGURATION
@@ -258,7 +265,7 @@
                 TYPE_EPAISSEUR:  'Epaisseur_'
             }
         };
-
+ 
         // ═══════════════════════════════════════════════════════════════════════
         // Variables globales
         // ═══════════════════════════════════════════════════════════════════════
@@ -269,7 +276,7 @@
         let entityTypes = new Set();
         let dataLoaded = false;
         let centralityScores = {};
-
+ 
         const typeColors = {
             'M': '#E74C3C', 'D': '#3498DB', 'SD': '#2ECC71', 'B': '#F39C12',
             'S': '#9B59B6', 'P': '#1ABC9C', 'C': '#E67E22', 'U': '#16A085',
@@ -277,33 +284,48 @@
             'Bureau': '#F39C12', 'Service': '#9B59B6', 'Pôle': '#1ABC9C',
             'Cellule': '#E67E22', 'Unité': '#16A085'
         };
-
+ 
         const typeLabels = {
             'M': 'Mission', 'D': 'Direction', 'SD': 'Sous-direction', 'B': 'Bureau',
             'S': 'Service', 'P': 'Pôle', 'C': 'Cellule', 'U': 'Unité'
         };
-
+ 
         function getTypeColor(type) { return typeColors[type] || '#95A5A6'; }
         function getTypeLabel(type) { return typeLabels[type] || type; }
-
+ 
         // ═══════════════════════════════════════════════════════════════════════
         // TOOLTIP PERSONNALISÉ
         // ═══════════════════════════════════════════════════════════════════════
         const tooltipEl = document.getElementById('custom-tooltip');
-        let tooltipVisible = false;
-
+        let tooltipPinned = false;
+ 
         function showTooltip(x, y, html) {
+            // Wrap content with a close button inside the first child (header)
             tooltipEl.innerHTML = html;
+            // Inject close button into the header element
+            const header = tooltipEl.querySelector('.tooltip-header, .tooltip-edge-header');
+            if (header) {
+                const btn = document.createElement('button');
+                btn.id = 'tooltip-close';
+                btn.innerHTML = '✕';
+                btn.title = 'Fermer';
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    hideTooltip();
+                });
+                header.style.position = 'relative';
+                header.appendChild(btn);
+            }
             tooltipEl.style.display = 'block';
-            tooltipVisible = true;
+            tooltipPinned = true;
             positionTooltip(x, y);
         }
-
+ 
         function hideTooltip() {
             tooltipEl.style.display = 'none';
-            tooltipVisible = false;
+            tooltipPinned = false;
         }
-
+ 
         function positionTooltip(x, y) {
             const tw = tooltipEl.offsetWidth  || 280;
             const th = tooltipEl.offsetHeight || 150;
@@ -316,11 +338,14 @@
             tooltipEl.style.left = left + 'px';
             tooltipEl.style.top  = top  + 'px';
         }
-
-        document.getElementById('mynetwork').addEventListener('mousemove', function(e) {
-            if (tooltipVisible) positionTooltip(e.clientX, e.clientY);
+ 
+        // Clic en dehors du tooltip → fermer
+        document.addEventListener('click', function(e) {
+            if (tooltipPinned && !tooltipEl.contains(e.target)) {
+                hideTooltip();
+            }
         });
-
+ 
         // ─── Tooltip NŒUD ───────────────────────────────────────────────────
         function buildNodeTooltip(entity) {
             const color    = getTypeColor(entity.Type);
@@ -329,7 +354,7 @@
             const pct      = ((c.normalized || 0) * 100).toFixed(0);
             const degree   = c.degree   || 0;
             const weighted = c.weighted || 0;
-
+ 
             let html = `<div class="tooltip-node">
                 <div class="tooltip-header" style="background:${color};">
                     <div class="tooltip-nom">${entity.Nom}</div>
@@ -340,14 +365,14 @@
                         <span class="t-label">Type</span>
                         <span class="t-value">${label}</span>
                     </div>`;
-
+ 
             if (entity.Responsable) {
                 html += `<div class="tooltip-row">
                     <span class="t-label">Responsable</span>
                     <span class="t-value">${entity.Responsable}</span>
                 </div>`;
             }
-
+ 
             // ✅ Ligne Contact avec mailto cliquable
             if (entity.Contact) {
                 html += `<div class="tooltip-row">
@@ -362,7 +387,7 @@
                     </span>
                 </div>`;
             }
-
+ 
             html += `<div class="tooltip-metrics">
                     <div class="tooltip-metric">
                         <span class="m-value">${pct}%</span>
@@ -377,15 +402,15 @@
                         <span class="m-label">Score</span>
                     </div>
                 </div>`;
-
+ 
             if (entity.Description) {
                 html += `<div class="tooltip-desc">${entity.Description}</div>`;
             }
-
+ 
             html += `</div></div>`;
             return html;
         }
-
+ 
         // ─── Tooltip LIEN ────────────────────────────────────────────────────
         function buildEdgeTooltip(relation) {
             const relType   = relationTypes.find(t => t.id === relation.Type) || {};
@@ -395,7 +420,7 @@
             const intensite = relation.Intensité || 'Moyenne';
             const iClass    = intensite === 'Forte'  ? 'intensite-forte'  :
                               intensite === 'Faible' ? 'intensite-faible' : 'intensite-moyenne';
-
+ 
             return `<div class="tooltip-edge">
                 <div class="tooltip-edge-header" style="background:${color};">
                     <div class="edge-type">${relType.Nom || 'Relation'}</div>
@@ -430,7 +455,7 @@
                 </div>
             </div>`;
         }
-
+ 
         // ═══════════════════════════════════════════════════════════════════════
         // Entités connectées
         // ═══════════════════════════════════════════════════════════════════════
@@ -455,7 +480,7 @@
             }
             return connected;
         }
-
+ 
         // ═══════════════════════════════════════════════════════════════════════
         // Centralité
         // ═══════════════════════════════════════════════════════════════════════
@@ -473,7 +498,7 @@
             Object.keys(c).forEach(id => { c[id].normalized = c[id].score / maxS; });
             return c;
         }
-
+ 
         // ═══════════════════════════════════════════════════════════════════════
         // Métriques réseau
         // ═══════════════════════════════════════════════════════════════════════
@@ -494,7 +519,7 @@
             });
             return { density, avgDegree, strong, medium, weak, maxNode, maxDeg };
         }
-
+ 
         // ═══════════════════════════════════════════════════════════════════════
         // Debug
         // ═══════════════════════════════════════════════════════════════════════
@@ -517,7 +542,7 @@
             document.getElementById('strongLinkLabel').textContent = document.getElementById('strongLinkForce').value + 'px';
             document.getElementById('weakLinkLabel').textContent   = document.getElementById('weakLinkForce').value   + 'px';
         }
-
+ 
         // ═══════════════════════════════════════════════════════════════════════
         // Helper colonne
         // ═══════════════════════════════════════════════════════════════════════
@@ -526,12 +551,12 @@
             if (Array.isArray(value)) return value[0] || '';
             return value;
         }
-
+ 
         // ═══════════════════════════════════════════════════════════════════════
         // Grist
         // ═══════════════════════════════════════════════════════════════════════
         grist.ready({ requiredAccess: 'read table', allowSelectBy: true });
-
+ 
         // ═══════════════════════════════════════════════════════════════════════
         // Chargement
         // ═══════════════════════════════════════════════════════════════════════
@@ -544,7 +569,7 @@
                     grist.docApi.fetchTable(CONFIG.TABLES.TYPES_RELATIONS)
                 ]);
                 if (!entitiesData.id?.length) throw new Error(`Table ${CONFIG.TABLES.ENTITES} vide`);
-
+ 
                 // ✅ CORRECTION : virgule ajoutée après Actif
                 allEntities = entitiesData.id.map((id, i) => ({
                     id,
@@ -556,7 +581,7 @@
                     Actif:       getColumn(entitiesData, CONFIG.COLONNES.ENTITE_ACTIF,   i) !== false,  // ✅ VIRGULE
                     Contact:     getColumn(entitiesData, CONFIG.COLONNES.ENTITE_CONTACT, i) || ''
                 }));
-
+ 
                 allRelations = (relationsData.id || []).map((id, i) => ({
                     id,
                     Source:         getColumn(relationsData, CONFIG.COLONNES.REL_SOURCE,    i),
@@ -567,21 +592,21 @@
                     Commentaire:    getColumn(relationsData, CONFIG.COLONNES.REL_COMMENT,   i) || '',
                     Validé:         getColumn(relationsData, CONFIG.COLONNES.REL_VALIDE,    i) !== false
                 }));
-
+ 
                 relationTypes = (typesData.id || []).map((id, i) => ({
                     id,
                     Nom:       getColumn(typesData, CONFIG.COLONNES.TYPE_NOM,       i) || '',
                     Couleur:   getColumn(typesData, CONFIG.COLONNES.TYPE_COULEUR,   i) || '#95A5A6',
                     Épaisseur: getColumn(typesData, CONFIG.COLONNES.TYPE_EPAISSEUR, i) || 1
                 }));
-
+ 
                 log('success', `✅ ${allEntities.length} entités, ${allRelations.length} relations, ${relationTypes.length} types`);
                 entityTypes = new Set(allEntities.map(e => e.Type).filter(Boolean));
                 dataLoaded = true;
                 populateFilters();
                 refreshGraph();
                 document.getElementById('loading').classList.add('hidden');
-
+ 
             } catch (err) {
                 log('error', `❌ ${err.message}`);
                 document.getElementById('loading').innerHTML = `
@@ -591,7 +616,7 @@
                 dbg.style.display = 'block';
             }
         }
-
+ 
         // ═══════════════════════════════════════════════════════════════════════
         // Réinitialisation
         // ═══════════════════════════════════════════════════════════════════════
@@ -603,7 +628,7 @@
             document.getElementById('depthControl').style.display = 'none';
             refreshGraph();
         }
-
+ 
         // ═══════════════════════════════════════════════════════════════════════
         // Filtres
         // ═══════════════════════════════════════════════════════════════════════
@@ -619,7 +644,7 @@
                     opt.textContent = entity.Sigle ? `${entity.Sigle} — ${entity.Nom}` : entity.Nom;
                     specificSel.appendChild(opt);
                 });
-
+ 
             // ─── Types de relations ─────────────────────────────────────────────
             const relSel = document.getElementById('filterRelation');
             relSel.innerHTML = '<option value="all">Toutes</option>';
@@ -631,7 +656,7 @@
                     relSel.appendChild(opt);
                 }
             });
-
+ 
             // ─── Types d'entités (tri alphabétique par label) ───────────────────
             const entSel = document.getElementById('filterEntity');
             entSel.innerHTML = '<option value="all">Toutes</option>';
@@ -644,7 +669,7 @@
                     opt.textContent = `${getTypeLabel(type)} (${count})`;
                     entSel.appendChild(opt);
                 });
-
+ 
             // ─── Événements (une seule fois via data-init) ──────────────────────
             if (!specificSel.dataset.init) {
                 specificSel.addEventListener('change', function () {
@@ -672,13 +697,13 @@
             }
             log('success', '✅ Filtres initialisés');
         }
-
+ 
         // ═══════════════════════════════════════════════════════════════════════
         // Rendu du graphe
         // ═══════════════════════════════════════════════════════════════════════
         function refreshGraph() {
             if (!dataLoaded || allEntities.length === 0) return;
-
+ 
             const showInactive    = document.getElementById('showInactive').checked;
             const filterRel       = document.getElementById('filterRelation').value;
             const filterEnt       = document.getElementById('filterEntity').value;
@@ -688,35 +713,35 @@
             const weakForce       = parseInt(document.getElementById('weakLinkForce').value);
             const specificEntity  = document.getElementById('filterSpecificEntity').value;
             const depth           = document.getElementById('relationDepth').value;
-
+ 
             let connectedIds = null;
             if (specificEntity !== 'all') {
                 connectedIds = getConnectedEntities(specificEntity, allRelations, depth);
             }
-
+ 
             const filteredEntities = allEntities.filter(e => {
                 if (!showInactive && !e.Actif) return false;
                 if (filterEnt !== 'all' && e.Type !== filterEnt) return false;
                 if (connectedIds && !connectedIds.has(e.id)) return false;
                 return true;
             });
-
+ 
             const entityIds = new Set(filteredEntities.map(e => e.id));
-
+ 
             const filteredRelations = allRelations.filter(r => {
                 if (!r.Validé) return false;
                 if (filterRel !== 'all' && r.Type !== parseInt(filterRel)) return false;
                 return entityIds.has(r.Source) && entityIds.has(r.Cible);
             });
-
+ 
             centralityScores = calculateCentrality(filteredEntities, filteredRelations);
-
+ 
             // ─── Nœuds ─────────────────────────────────────────────────────────
             const nodes = filteredEntities.map(e => {
                 const color      = getTypeColor(e.Type);
                 const centrality = centralityScores[e.id]?.normalized || 0;
                 const nodeSize   = showCentrality ? 20 + (centrality * 30) : 20;
-
+ 
                 return {
                     id:          e.id,
                     label:       e.Sigle || e.Nom,
@@ -734,7 +759,7 @@
                     opacity:     e.Actif ? 1 : 0.5
                 };
             });
-
+ 
             // ─── Liens ─────────────────────────────────────────────────────────
             const edges = filteredRelations.map(r => {
                 const relType = relationTypes.find(t => t.id === r.Type) || {};
@@ -757,7 +782,7 @@
                     smooth: { type: 'continuous', roundness: r.Intensité === 'Forte' ? 0.2 : 0.5 }
                 };
             });
-
+ 
             // ─── Options ───────────────────────────────────────────────────────
             const options = {
                 nodes: { borderWidth: 2, borderWidthSelected: 4, shadow: true,
@@ -779,7 +804,7 @@
                     timestep: 0.5
                 },
                 interaction: {
-                    hover: true,
+                    hover: false,
                     tooltipDelay: 99999,
                     navigationButtons: true,
                     keyboard: true,
@@ -788,54 +813,57 @@
                 },
                 layout: { improvedLayout: true, hierarchical: false }
             };
-
+ 
             const container = document.getElementById('mynetwork');
             const data = { nodes, edges };
-
+ 
             if (network) {
                 network.setData(data);
                 network.setOptions(options);
             } else {
                 network = new vis.Network(container, data, options);
-
-                network.on('hoverNode', function (params) {
+ 
+                network.on('clickNode', function (params) {
                     const entity = allEntities.find(e => e.id === params.node);
                     if (!entity) return;
                     showTooltip(params.pointer.DOM.x, params.pointer.DOM.y, buildNodeTooltip(entity));
                 });
-                network.on('blurNode', hideTooltip);
-
-                network.on('hoverEdge', function (params) {
+ 
+                network.on('clickEdge', function (params) {
                     const relation = allRelations.find(r => r.id === params.edge);
                     if (!relation) return;
                     showTooltip(params.pointer.DOM.x, params.pointer.DOM.y, buildEdgeTooltip(relation));
                 });
-                network.on('blurEdge', hideTooltip);
-
-                network.on('click',     hideTooltip);
+ 
+                // Clic sur le fond (pas sur un nœud/arête) → fermer
+                network.on('click', function (params) {
+                    if (params.nodes.length === 0 && params.edges.length === 0) {
+                        hideTooltip();
+                    }
+                });
                 network.on('dragStart', hideTooltip);
                 network.on('zoom',      hideTooltip);
-
+ 
                 network.on('selectNode', function (params) {
                     const entity = allEntities.find(e => e.id === params.nodes[0]);
                     log('info', `📍 ${entity?.Nom || params.nodes[0]}`);
                 });
-
+ 
                 network.on('stabilizationIterationsDone', function () {
                     log('success', '✅ Stabilisation terminée');
                     network.setOptions({ physics: false });
                 });
             }
-
+ 
             updateInfoPanel(filteredEntities, filteredRelations);
         }
-
+ 
         // ═══════════════════════════════════════════════════════════════════════
         // Panneau info
         // ═══════════════════════════════════════════════════════════════════════
         function updateInfoPanel(filteredEntities, filteredRelations) {
             const m = calculateNetworkMetrics(filteredEntities, filteredRelations);
-
+ 
             document.getElementById('metricsContent').innerHTML = `
                 <div class="stats-row"><span>Densité :</span><strong>${(m.density * 100).toFixed(1)}%</strong></div>
                 <div class="stats-row"><span>Degré moyen :</span><strong>${m.avgDegree.toFixed(1)}</strong></div>
@@ -844,13 +872,13 @@
                 <div class="stats-row"><span>Liens faibles :</span><strong>${m.weak}</strong></div>
                 ${m.maxNode ? `<div class="stats-total">Plus connecté : <strong>${m.maxNode.Nom}</strong> (${m.maxDeg} liens)</div>` : ''}
             `;
-
+ 
             document.getElementById('statsContent').innerHTML = `
                 <div class="stats-row"><span>Entités affichées :</span><strong>${filteredEntities.length}</strong></div>
                 <div class="stats-row"><span>Relations affichées :</span><strong>${filteredRelations.length}</strong></div>
                 <div class="stats-total">Total : ${allEntities.length} entités, ${allRelations.length} relations</div>
             `;
-
+ 
             const usedTypes = new Set(allEntities.map(e => e.Type).filter(Boolean));
             let entHTML = '';
             [...usedTypes].sort((a, b) => getTypeLabel(a).localeCompare(getTypeLabel(b), 'fr')).forEach(type => {
@@ -861,7 +889,7 @@
                 </div>`;
             });
             document.getElementById('entitiesLegend').innerHTML = entHTML || '<em style="color:#999;font-size:11px;">Aucune donnée</em>';
-
+ 
             let relHTML = '';
             relationTypes.forEach(t => {
                 const count = allRelations.filter(r => r.Type === t.id).length;
@@ -874,7 +902,7 @@
             });
             document.getElementById('relationsLegend').innerHTML = relHTML || '<em style="color:#999;font-size:11px;">Aucune donnée</em>';
         }
-
+ 
         // ═══════════════════════════════════════════════════════════════════════
         // Actions
         // ═══════════════════════════════════════════════════════════════════════
@@ -885,7 +913,7 @@
                 setTimeout(() => network.setOptions({ physics: { enabled: false } }), 3000);
             }
         }
-
+ 
         function exportImage() {
             if (!network) return;
             const canvas = document.querySelector('#mynetwork canvas');
@@ -895,7 +923,7 @@
             link.click();
             log('success', '📸 Export PNG');
         }
-
+ 
         // ═══════════════════════════════════════════════════════════════════════
         // Événements Grist
         // ═══════════════════════════════════════════════════════════════════════
@@ -905,7 +933,7 @@
                 await loadAllData();
             }
         });
-
+ 
         // ═══════════════════════════════════════════════════════════════════════
         // Démarrage
         // ═══════════════════════════════════════════════════════════════════════
