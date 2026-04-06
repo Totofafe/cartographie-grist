@@ -780,15 +780,17 @@
                     solver: 'barnesHut',
                     timestep: 0.5
                 },
-                interaction: {
-                    hover: true,
-                    tooltipDelay: 99999,
-                    navigationButtons: true,
-                    keyboard: true,
-                    dragView: true,
-                    zoomView: true
-                },
                 layout: { improvedLayout: true, hierarchical: false }
+            };
+
+            // interaction définie une seule fois à la création, jamais réécrasée par setOptions
+            const interactionOptions = {
+                hover: true,
+                tooltipDelay: 99999,
+                navigationButtons: true,
+                keyboard: true,
+                dragView: true,
+                zoomView: true
             };
 
             const container = document.getElementById('mynetwork');
@@ -798,7 +800,7 @@
                 network.setData(data);
                 network.setOptions(options);
             } else {
-                network = new vis.Network(container, data, options);
+                network = new vis.Network(container, data, { ...options, interaction: interactionOptions });
 
                 // Survol nœud → affiche tooltip flottant
                 network.on('hoverNode', function (params) {
