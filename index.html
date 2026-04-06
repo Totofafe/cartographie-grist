@@ -949,29 +949,75 @@
             centralityScores = calculateCentrality(filteredEntities, filteredRelations);
 
             // ─── Nœuds ─────────────────────────────────────────────────────────
-            const nodes = filteredEntities.map(e => {
-                const color      = getTypeColor(e.Type);
-                const centrality = centralityScores[e.id]?.normalized || 0;
-                const nodeSize   = showCentrality ? 20 + centrality * 30 : 20;
+const nodes = filteredEntities.map(e => {
+    const color = getTypeColor(e.Type);
+    const label = e.Sigle || e.Nom;
+    const typeLabel = getTypeLabel(e.Type);
+    const centrality = centralityScores[e.id]?.normalized || 0;
+    const baseSize = 20;
+    const nodeSize = showCentrality ? baseSize + (centrality * 30) : baseSize;
 
-                return {
-                    id:          e.id,
-                    label:       e.Sigle || e.Nom,
-                    // title vide : on gère le tooltip manuellement
-                    title:       '',
-                    color:       e.Actif ? color : '#CCCCCC',
-                    shape:       e.Type === 'D' || e.Type === 'Direction' ? 'box' : 'ellipse',
-                    size:        nodeSize,
-                    value:       centrality * 100,
-                    font: {
-                        size:  Math.max(12, 12 + centrality * 6),
-                        bold:  (e.Type === 'D' || e.Type === 'Direction') || centrality > 0.7,
-                        color: e.Actif ? '#000000' : '#999999'
-                    },
-                    borderWidth: e.Actif ? 2 + Math.floor(centrality * 2) : 1,
-                    opacity:     e.Actif ? 1 : 0.5
-                };
-            });
+    // ─── Construction du tooltip ────────────────────────────────────────
+    // Ligne Contact avec mailto cliquable
+    const contactLine = e.Contact ? 
+        `<br><b>Contact :</b> <a href="mailto:${e.Contact}" 
+            style="color: #3498db; text-decoration: none;"
+            title="Envoyer un email à ${e.Contact}">
+            ${e.Contact}
+        </a>` : '';
+
+    return {
+        id: e.id,
+        label: label,
+        title: `<div style="font-family: sans-serif; font-size: 13px; max-width: 280px; line-height: 1.6;">
+                    <div style="font-weight: 700; font-size: 14px; color: #2c3e50; 
+                                border-bottom: 2px solid ${color}; padding-bottom: 5px; margin-bottom: 8px;">
+                        ${e.Nom}
+                    </div>
+                    <div style="color: #666; margin: 4px 0;">
+                        <b style="color: #333;">Type :</b> ${typeLabel}
+                    </div>
+                    <div style="color: #666; margin: 4px 0;">
+                        <b style="color: #333;">Responsable :</b> ${e.Responsable || 'N/A'}
+                    </div>
+                    <div style="color: #666; margin: 4px 0;">
+                        <b style="color: #333;">Contact :</b> ${
+                            e.Contact ? 
+                            `<a href="mailto:${e.Contact}" 
+                                style="color: #3498db; text-decoration: none;"
+                                onmouseover="this.style.textDecoration='underline'"
+                                onmouseout="this.style.textDecoration='none'">
+                                ${e.Contact}
+                            </a>` : 
+                            '<em style="color: #999;">Non renseigné</em>'
+                        }
+                    </div>
+                    <div style="margin-top: 8px; padding-top: 8px; 
+                                border-top: 1px solid #eee; font-size: 11px; color: #888;">
+                        <b>Centralité :</b> ${(centrality * 100).toFixed(0)}% &nbsp;|&nbsp;
+                        <b>Degré :</b> ${centralityScores[e.id]?.degree || 0} &nbsp;|&nbsp;
+                        <b>Score :</b> ${centralityScores[e.id]?.weighted || 0}
+                    </div>
+                    ${e.Description ? `
+                    <div style="margin-top: 8px; padding: 6px 8px; background: #f8f9fa; 
+                                border-radius: 4px; font-size: 11px; color: #666; 
+                                font-style: italic;">
+                        ${e.Description}
+                    </div>` : ''}
+                </div>`,
+        color: e.Actif ? color : '#CCCCCC',
+        shape: e.Type === 'D' || e.Type === 'Direction' ? 'box' : 'ellipse',
+        size: nodeSize,
+        value: centrality * 100,
+        font: { 
+            size: Math.max(12, 12 + centrality * 6),
+            bold: (e.Type === 'D' || e.Type === 'Direction') || centrality > 0.7,
+            color: e.Actif ? '#000000' : '#999999'
+        },
+        borderWidth: e.Actif ? 2 + Math.floor(centrality * 2) : 1,
+        opacity: e.Actif ? 1 : 0.5
+    };
+});
 
             // ─── Liens ─────────────────────────────────────────────────────────
             const edges = filteredRelations.map(r => {
