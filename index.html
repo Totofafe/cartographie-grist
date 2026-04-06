@@ -228,7 +228,154 @@
         .debug-success { color: #51cf66; }
         .debug-info { color: #74c0fc; }
         .debug-warning { color: #ffd43b; }
-        
+
+        /* ═══════════════════════════════════════════════════════════════
+           TOOLTIP PERSONNALISÉ
+        ═══════════════════════════════════════════════════════════════ */
+        #custom-tooltip {
+            position: fixed;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 0;
+            font-size: 13px;
+            pointer-events: none;
+            z-index: 9999;
+            display: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            max-width: 300px;
+            min-width: 220px;
+            overflow: hidden;
+        }
+        .tooltip-header {
+            background: #2c3e50;
+            color: white;
+            padding: 10px 14px;
+            border-radius: 8px 8px 0 0;
+        }
+        .tooltip-header .tooltip-name {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+        .tooltip-header .tooltip-sigle {
+            font-size: 11px;
+            opacity: 0.7;
+            font-style: italic;
+        }
+        .tooltip-body {
+            padding: 10px 14px;
+        }
+        .tooltip-row {
+            display: flex;
+            align-items: flex-start;
+            margin: 6px 0;
+            font-size: 12px;
+        }
+        .tooltip-row .tooltip-label {
+            color: #888;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            min-width: 85px;
+            padding-top: 1px;
+            flex-shrink: 0;
+        }
+        .tooltip-row .tooltip-value {
+            color: #2c3e50;
+            font-weight: 600;
+            flex: 1;
+        }
+        .tooltip-type-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+        }
+        .tooltip-divider {
+            height: 1px;
+            background: #f0f0f0;
+            margin: 8px 0;
+        }
+        .tooltip-metrics {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .tooltip-metric-box {
+            flex: 1;
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 6px 8px;
+            text-align: center;
+        }
+        .tooltip-metric-box .metric-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2c3e50;
+            display: block;
+        }
+        .tooltip-metric-box .metric-label {
+            font-size: 10px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .tooltip-description {
+            margin-top: 8px;
+            padding: 8px 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            font-size: 11px;
+            color: #666;
+            line-height: 1.5;
+            font-style: italic;
+        }
+        /* Tooltip pour les liens */
+        .tooltip-edge-header {
+            background: #34495e;
+            color: white;
+            padding: 10px 14px;
+            border-radius: 8px 8px 0 0;
+        }
+        .tooltip-edge-header .tooltip-edge-type {
+            font-size: 13px;
+            font-weight: 700;
+        }
+        .tooltip-arrow {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            font-size: 12px;
+        }
+        .tooltip-arrow .arrow-entity {
+            background: #ecf0f1;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 11px;
+        }
+        .tooltip-arrow .arrow-sym {
+            color: white;
+            font-size: 14px;
+        }
+        .tooltip-intensite {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+            margin-top: 6px;
+        }
+        .intensite-forte { background: #e74c3c; }
+        .intensite-moyenne { background: #f39c12; }
+        .intensite-faible { background: #95a5a6; }
+
         #info-panel::-webkit-scrollbar,
         #controls::-webkit-scrollbar { width: 6px; }
         #info-panel::-webkit-scrollbar-track,
@@ -248,7 +395,7 @@
     <div id="controls">
         <h3>🎛️ Contrôles</h3>
         
-        <!-- NOUVEAU : Filtre par entité spécifique -->
+        <!-- Filtre par entité spécifique -->
         <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 2px solid #3498db;">
             <label style="display: block; margin-bottom: 3px; font-size: 11px; font-weight: 600;">🎯 Centrer sur une entité :</label>
             <select id="filterSpecificEntity">
@@ -286,7 +433,7 @@
             </select>
         </div>
         
-        <!-- Section Layout (Phase 1) -->
+        <!-- Section Layout Phase 1 -->
         <div class="control-section">
             <div class="control-section-title">⚡ Layout par intensité <span class="badge new">Phase 1</span></div>
             
@@ -315,7 +462,7 @@
             </div>
         </div>
         
-        <!-- Boutons d'action -->
+        <!-- Boutons -->
         <button onclick="network && network.fit()">🎯 Recentrer</button>
         <button onclick="resetPhysics()">🔄 Réinitialiser layout</button>
         <button onclick="resetFilters()" class="reset-btn">↺ Réinitialiser filtres</button>
@@ -328,52 +475,36 @@
     <div id="info-panel">
         <h3>📊 Informations</h3>
         
-        <!-- Métriques réseau (Phase 1) -->
         <div class="info-section" id="metrics-section">
             <h4>Métriques du réseau <span class="badge new">Phase 1</span></h4>
             <div id="metricsContent">
-                <div class="stats-row">
-                    <span>Densité :</span>
-                    <strong>—</strong>
-                </div>
-                <div class="stats-row">
-                    <span>Degré moyen :</span>
-                    <strong>—</strong>
-                </div>
-                <div class="stats-row">
-                    <span>Liens forts :</span>
-                    <strong>—</strong>
-                </div>
+                <div class="stats-row"><span>Densité :</span><strong>—</strong></div>
+                <div class="stats-row"><span>Degré moyen :</span><strong>—</strong></div>
+                <div class="stats-row"><span>Liens forts :</span><strong>—</strong></div>
             </div>
         </div>
         
-        <!-- Statistiques -->
         <div class="info-section" id="stats-section">
             <h4>Statistiques</h4>
             <div id="statsContent">
-                <div class="stats-row">
-                    <span>Entités affichées :</span>
-                    <strong>—</strong>
-                </div>
-                <div class="stats-row">
-                    <span>Relations affichées :</span>
-                    <strong>—</strong>
-                </div>
+                <div class="stats-row"><span>Entités affichées :</span><strong>—</strong></div>
+                <div class="stats-row"><span>Relations affichées :</span><strong>—</strong></div>
             </div>
         </div>
 
-        <!-- Types d'entités -->
         <div class="info-section" id="entities-section">
             <h4>Types d'entités</h4>
             <div id="entitiesLegend">Chargement...</div>
         </div>
 
-        <!-- Types de relations -->
         <div class="info-section" id="relations-section">
             <h4>Types de relations</h4>
             <div id="relationsLegend">Chargement...</div>
         </div>
     </div>
+
+    <!-- TOOLTIP PERSONNALISÉ -->
+    <div id="custom-tooltip"></div>
 
     <div id="debug"></div>
 
@@ -387,7 +518,6 @@
                 RELATIONS:       'RELATIONS',
                 TYPES_RELATIONS: 'TYPES_RELATIONS'
             },
-            
             COLONNES: {
                 ENTITE_NOM:      'Nom',
                 ENTITE_SIGLE:    'Sigle',
@@ -395,7 +525,6 @@
                 ENTITE_DESC:     'Description',
                 ENTITE_RESP:     'Responsable',
                 ENTITE_ACTIF:    'Actif',
-                
                 REL_SOURCE:      'Source_',
                 REL_CIBLE:       'Cible_',
                 REL_TYPE:        'Type_',
@@ -403,7 +532,6 @@
                 REL_BIDIRECT:    'Bidirectionnel',
                 REL_COMMENT:     'Commentaire',
                 REL_VALIDE:      'Valide',
-                
                 TYPE_NOM:        'Nom_',
                 TYPE_COULEUR:    'Couleur_',
                 TYPE_EPAISSEUR:  'Epaisseur_'
@@ -443,19 +571,146 @@
         }
 
         // ═══════════════════════════════════════════════════════════════════════
-        // NOUVEAU : Calcul des entités connectées à N niveaux
+        // TOOLTIP PERSONNALISÉ
+        // ═══════════════════════════════════════════════════════════════════════
+        const tooltip = document.getElementById('custom-tooltip');
+
+        function showTooltip(x, y, html) {
+            tooltip.innerHTML = html;
+            tooltip.style.display = 'block';
+            
+            // Ajustement position pour ne pas dépasser l'écran
+            const tw = tooltip.offsetWidth;
+            const th = tooltip.offsetHeight;
+            const ww = window.innerWidth;
+            const wh = window.innerHeight;
+            
+            let left = x + 15;
+            let top = y + 15;
+            
+            if (left + tw > ww - 20) left = x - tw - 15;
+            if (top + th > wh - 20) top = y - th - 15;
+            
+            tooltip.style.left = left + 'px';
+            tooltip.style.top = top + 'px';
+        }
+
+        function hideTooltip() {
+            tooltip.style.display = 'none';
+        }
+
+        function buildNodeTooltip(entity, centrality) {
+            const color = getTypeColor(entity.Type);
+            const typeLabel = getTypeLabel(entity.Type);
+            const centralityPct = centrality ? Math.round(centrality.normalized * 100) : 0;
+            const degree = centrality ? centrality.degree : 0;
+            const weighted = centrality ? centrality.weighted : 0;
+
+            let html = `
+                <div class="tooltip-header" style="background: ${color};">
+                    <div class="tooltip-name">${entity.Nom}</div>
+                    ${entity.Sigle ? `<div class="tooltip-sigle">Sigle : ${entity.Sigle}</div>` : ''}
+                </div>
+                <div class="tooltip-body">
+                    <div class="tooltip-row">
+                        <span class="tooltip-label">Type</span>
+                        <span class="tooltip-value">
+                            <span class="tooltip-type-badge" style="background: ${color};">
+                                ${typeLabel}
+                            </span>
+                        </span>
+                    </div>`;
+
+            if (entity.Responsable) {
+                html += `
+                    <div class="tooltip-row">
+                        <span class="tooltip-label">Responsable</span>
+                        <span class="tooltip-value">${entity.Responsable}</span>
+                    </div>`;
+            }
+
+            html += `
+                    <div class="tooltip-divider"></div>
+                    <div class="tooltip-metrics">
+                        <div class="tooltip-metric-box">
+                            <span class="metric-value">${centralityPct}%</span>
+                            <span class="metric-label">Centralité</span>
+                        </div>
+                        <div class="tooltip-metric-box">
+                            <span class="metric-value">${degree}</span>
+                            <span class="metric-label">Degré</span>
+                        </div>
+                        <div class="tooltip-metric-box">
+                            <span class="metric-value">${weighted}</span>
+                            <span class="metric-label">Score</span>
+                        </div>
+                    </div>`;
+
+            if (entity.Description) {
+                html += `
+                    <div class="tooltip-description">${entity.Description}</div>`;
+            }
+
+            html += `</div>`;
+            return html;
+        }
+
+        function buildEdgeTooltip(relation, relType, sourceEntity, targetEntity) {
+            const color = relType?.Couleur || '#34495e';
+            const intensite = relation.Intensité || 'Moyenne';
+            const intensiteClass = intensite === 'Forte' ? 'intensite-forte' :
+                                  intensite === 'Faible' ? 'intensite-faible' :
+                                  'intensite-moyenne';
+
+            let html = `
+                <div class="tooltip-edge-header" style="background: ${color};">
+                    <div class="tooltip-edge-type">${relType?.Nom || 'Relation'}</div>
+                    <div class="tooltip-arrow">
+                        <span class="arrow-entity">${sourceEntity?.Sigle || sourceEntity?.Nom || '?'}</span>
+                        <span class="arrow-sym">${relation.Bidirectionnel ? '⟷' : '→'}</span>
+                        <span class="arrow-entity">${targetEntity?.Sigle || targetEntity?.Nom || '?'}</span>
+                    </div>
+                </div>
+                <div class="tooltip-body">
+                    <div class="tooltip-row">
+                        <span class="tooltip-label">Source</span>
+                        <span class="tooltip-value">${sourceEntity?.Nom || '?'}</span>
+                    </div>
+                    <div class="tooltip-row">
+                        <span class="tooltip-label">Cible</span>
+                        <span class="tooltip-value">${targetEntity?.Nom || '?'}</span>
+                    </div>
+                    <div class="tooltip-divider"></div>
+                    <div class="tooltip-row">
+                        <span class="tooltip-label">Intensité</span>
+                        <span class="tooltip-value">
+                            <span class="tooltip-intensite ${intensiteClass}">${intensite}</span>
+                        </span>
+                    </div>
+                    ${relation.Bidirectionnel ? `
+                    <div class="tooltip-row">
+                        <span class="tooltip-label">Direction</span>
+                        <span class="tooltip-value">⟷ Bidirectionnel</span>
+                    </div>` : ''}
+                    ${relation.Commentaire ? `
+                    <div class="tooltip-divider"></div>
+                    <div class="tooltip-description">${relation.Commentaire}</div>` : ''}
+                </div>`;
+
+            return html;
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // Calcul des entités connectées
         // ═══════════════════════════════════════════════════════════════════════
         function getConnectedEntities(entityId, relations, maxDepth) {
-            if (!entityId || maxDepth === 'all') {
-                return null; // null = toutes les entités
-            }
+            if (!entityId || maxDepth === 'all') return null;
             
             const connected = new Set([parseInt(entityId)]);
             let currentLevel = new Set([parseInt(entityId)]);
             
             for (let depth = 0; depth < parseInt(maxDepth); depth++) {
                 const nextLevel = new Set();
-                
                 currentLevel.forEach(nodeId => {
                     relations.forEach(rel => {
                         if (rel.Source === nodeId && !connected.has(rel.Cible)) {
@@ -468,64 +723,52 @@
                         }
                     });
                 });
-                
                 if (nextLevel.size === 0) break;
                 currentLevel = nextLevel;
             }
-            
-            log('info', `🎯 Entités connectées: ${connected.size} (profondeur ${maxDepth})`);
             return connected;
         }
 
         // ═══════════════════════════════════════════════════════════════════════
-        // PHASE 1 : Calcul de centralité
+        // Calcul de centralité
         // ═══════════════════════════════════════════════════════════════════════
         function calculateCentrality(entities, relations) {
             const centrality = {};
-            
             entities.forEach(e => {
                 const outgoing = relations.filter(r => r.Source === e.id);
                 const incoming = relations.filter(r => r.Cible === e.id);
-                
                 const weightedScore = [...outgoing, ...incoming].reduce((sum, r) => {
-                    const weight = r.Intensité === 'Forte' ? 3 : 
-                                  r.Intensité === 'Moyenne' ? 2 : 1;
+                    const weight = r.Intensité === 'Forte' ? 3 : r.Intensité === 'Moyenne' ? 2 : 1;
                     return sum + weight;
                 }, 0);
-                
                 centrality[e.id] = {
                     score: weightedScore,
                     degree: outgoing.length + incoming.length,
                     weighted: weightedScore
                 };
             });
-            
             const maxScore = Math.max(...Object.values(centrality).map(c => c.score), 1);
             Object.keys(centrality).forEach(id => {
                 centrality[id].normalized = centrality[id].score / maxScore;
             });
-            
             return centrality;
         }
 
         // ═══════════════════════════════════════════════════════════════════════
-        // PHASE 1 : Métriques du réseau
+        // Métriques du réseau
         // ═══════════════════════════════════════════════════════════════════════
         function calculateNetworkMetrics(entities, relations) {
             const n = entities.length;
             const m = relations.length;
-            
             const maxLinks = n * (n - 1);
             const density = maxLinks > 0 ? m / maxLinks : 0;
             const avgDegree = n > 0 ? (m * 2) / n : 0;
-            
             const strongLinks = relations.filter(r => r.Intensité === 'Forte').length;
             const mediumLinks = relations.filter(r => r.Intensité === 'Moyenne').length;
             const weakLinks = relations.filter(r => r.Intensité === 'Faible').length;
-            
+
             let maxConnected = null;
             let maxConnections = 0;
-            
             if (Object.keys(centralityScores).length > 0) {
                 Object.entries(centralityScores).forEach(([id, data]) => {
                     if (data.degree > maxConnections) {
@@ -534,16 +777,7 @@
                     }
                 });
             }
-            
-            return {
-                density,
-                avgDegree,
-                strongLinks,
-                mediumLinks,
-                weakLinks,
-                maxConnected,
-                maxConnections
-            };
+            return { density, avgDegree, strongLinks, mediumLinks, weakLinks, maxConnected, maxConnections };
         }
 
         // ═══════════════════════════════════════════════════════════════════════
@@ -553,9 +787,7 @@
         
         function log(type, ...args) {
             console.log(...args);
-            const line = args.map(a => 
-                typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a)
-            ).join(' ');
+            const line = args.map(a => typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a)).join(' ');
             const className = `debug-${type}`;
             dbg.innerHTML += `<div class="${className}">${line}</div>`;
             dbg.scrollTop = dbg.scrollHeight;
@@ -572,10 +804,8 @@
         });
 
         function updateForceLabel() {
-            document.getElementById('strongLinkLabel').textContent = 
-                document.getElementById('strongLinkForce').value + 'px';
-            document.getElementById('weakLinkLabel').textContent = 
-                document.getElementById('weakLinkForce').value + 'px';
+            document.getElementById('strongLinkLabel').textContent = document.getElementById('strongLinkForce').value + 'px';
+            document.getElementById('weakLinkLabel').textContent = document.getElementById('weakLinkForce').value + 'px';
         }
 
         // ═══════════════════════════════════════════════════════════════════════
@@ -600,7 +830,7 @@
         // ═══════════════════════════════════════════════════════════════════════
         async function loadAllData() {
             try {
-                log('info', '🔄 Phase 1: Chargement...');
+                log('info', '🔄 Chargement...');
 
                 const [entitiesData, relationsData, typesData] = await Promise.all([
                     grist.docApi.fetchTable(CONFIG.TABLES.ENTITES),
@@ -613,7 +843,7 @@
                 }
 
                 allEntities = entitiesData.id.map((id, idx) => ({
-                    id: id,
+                    id,
                     Nom: getColumn(entitiesData, CONFIG.COLONNES.ENTITE_NOM, idx) || '',
                     Sigle: getColumn(entitiesData, CONFIG.COLONNES.ENTITE_SIGLE, idx) || '',
                     Type: getColumn(entitiesData, CONFIG.COLONNES.ENTITE_TYPE, idx) || '',
@@ -623,7 +853,7 @@
                 }));
 
                 allRelations = (relationsData.id || []).map((id, idx) => ({
-                    id: id,
+                    id,
                     Source: getColumn(relationsData, CONFIG.COLONNES.REL_SOURCE, idx),
                     Cible: getColumn(relationsData, CONFIG.COLONNES.REL_CIBLE, idx),
                     Type: getColumn(relationsData, CONFIG.COLONNES.REL_TYPE, idx),
@@ -634,13 +864,13 @@
                 }));
 
                 relationTypes = (typesData.id || []).map((id, idx) => ({
-                    id: id,
+                    id,
                     Nom: getColumn(typesData, CONFIG.COLONNES.TYPE_NOM, idx) || '',
                     Couleur: getColumn(typesData, CONFIG.COLONNES.TYPE_COULEUR, idx) || '#95A5A6',
                     Épaisseur: getColumn(typesData, CONFIG.COLONNES.TYPE_EPAISSEUR, idx) || 1
                 }));
 
-                log('success', `✅ ${allEntities.length} entités, ${allRelations.length} relations`);
+                log('success', `✅ ${allEntities.length} entités, ${allRelations.length} relations, ${relationTypes.length} types`);
 
                 entityTypes = new Set(allEntities.map(e => e.Type).filter(Boolean));
                 
@@ -649,23 +879,19 @@
                 refreshGraph();
                 document.getElementById('loading').classList.add('hidden');
 
-                log('success', '✅ Phase 1 initialisée');
-
             } catch (error) {
                 console.error('❌ Erreur:', error);
                 log('error', `❌ ${error.message}`);
                 document.getElementById('loading').innerHTML = `
                     <div style="color: #e74c3c; max-width: 500px; padding: 20px;">
-                        <strong>⚠️ Erreur de chargement</strong><br><br>
-                        ${error.message}
-                    </div>
-                `;
+                        <strong>⚠️ Erreur de chargement</strong><br><br>${error.message}
+                    </div>`;
                 dbg.style.display = 'block';
             }
         }
 
         // ═══════════════════════════════════════════════════════════════════════
-        // NOUVEAU : Fonction de réinitialisation des filtres
+        // Réinitialisation des filtres
         // ═══════════════════════════════════════════════════════════════════════
         function resetFilters() {
             document.getElementById('filterSpecificEntity').value = 'all';
@@ -678,36 +904,27 @@
         }
 
         // ═══════════════════════════════════════════════════════════════════════
-        // Filtres avec entité spécifique
+        // Filtres
         // ═══════════════════════════════════════════════════════════════════════
         function populateFilters() {
-            // NOUVEAU : Filtre entité spécifique
+            // Filtre entité spécifique - TRI PAR SIGLE
             const specificEntitySelect = document.getElementById('filterSpecificEntity');
             specificEntitySelect.innerHTML = '<option value="all">Vue complète</option>';
             
-            const sortedEntities = [...allEntities].sort((a, b) => 
-                (a.Sigle || '').localeCompare(b.Sigle || '')
-            );
+            const sortedEntities = [...allEntities].sort((a, b) => {
+                const siglaA = (a.Sigle || a.Nom || '').toLowerCase();
+                const siglaB = (b.Sigle || b.Nom || '').toLowerCase();
+                return siglaA.localeCompare(siglaB, 'fr');
+            });
             
             sortedEntities.forEach(entity => {
                 const opt = document.createElement('option');
                 opt.value = entity.id;
-                const label = entity.Sigle ? 
-                    `${entity.Sigle} - ${entity.Nom}` : 
-                    entity.Nom;
-                opt.textContent = label;
+                opt.textContent = entity.Sigle ? `${entity.Sigle} — ${entity.Nom}` : entity.Nom;
                 specificEntitySelect.appendChild(opt);
             });
-            
-            specificEntitySelect.addEventListener('change', function() {
-                const depthControl = document.getElementById('depthControl');
-                depthControl.style.display = this.value !== 'all' ? 'block' : 'none';
-                refreshGraph();
-            });
-            
-            document.getElementById('relationDepth').addEventListener('change', refreshGraph);
 
-            // Types de relations
+            // Filtre types de relations
             const relationSelect = document.getElementById('filterRelation');
             relationSelect.innerHTML = '<option value="all">Toutes</option>';
             relationTypes.forEach(type => {
@@ -719,29 +936,54 @@
                 }
             });
 
-            // Types d'entités
+            // Filtre types d'entités - TRI ALPHABÉTIQUE
             const entitySelect = document.getElementById('filterEntity');
             entitySelect.innerHTML = '<option value="all">Toutes</option>';
-            [...entityTypes].sort((a, b) => {
-    const labelA = getTypeLabel(a);
-    const labelB = getTypeLabel(b);
-    return labelA.localeCompare(labelB, 'fr');
-}).forEach(type => {
-                const count = allEntities.filter(e => e.Type === type).length;
-                const label = getTypeLabel(type);
-                const opt = document.createElement('option');
-                opt.value = type;
-                opt.textContent = `${label} (${count})`;
-                entitySelect.appendChild(opt);
-            });
+            [...entityTypes]
+                .sort((a, b) => getTypeLabel(a).localeCompare(getTypeLabel(b), 'fr'))
+                .forEach(type => {
+                    const count = allEntities.filter(e => e.Type === type).length;
+                    const opt = document.createElement('option');
+                    opt.value = type;
+                    opt.textContent = `${getTypeLabel(type)} (${count})`;
+                    entitySelect.appendChild(opt);
+                });
 
-            relationSelect.onchange = refreshGraph;
-            entitySelect.onchange = refreshGraph;
-            document.getElementById('showInactive').onchange = refreshGraph;
+            // Événements - attachés UNE SEULE FOIS via data-initialized
+            if (!specificEntitySelect.dataset.initialized) {
+                specificEntitySelect.addEventListener('change', function() {
+                    document.getElementById('depthControl').style.display = 
+                        this.value !== 'all' ? 'block' : 'none';
+                    refreshGraph();
+                });
+                specificEntitySelect.dataset.initialized = 'true';
+            }
+
+            if (!document.getElementById('relationDepth').dataset.initialized) {
+                document.getElementById('relationDepth').addEventListener('change', refreshGraph);
+                document.getElementById('relationDepth').dataset.initialized = 'true';
+            }
+
+            if (!relationSelect.dataset.initialized) {
+                relationSelect.addEventListener('change', refreshGraph);
+                relationSelect.dataset.initialized = 'true';
+            }
+
+            if (!entitySelect.dataset.initialized) {
+                entitySelect.addEventListener('change', refreshGraph);
+                entitySelect.dataset.initialized = 'true';
+            }
+
+            if (!document.getElementById('showInactive').dataset.initialized) {
+                document.getElementById('showInactive').addEventListener('change', refreshGraph);
+                document.getElementById('showInactive').dataset.initialized = 'true';
+            }
+
+            log('success', '✅ Filtres initialisés');
         }
 
         // ═══════════════════════════════════════════════════════════════════════
-        // PHASE 1 : Rendu avec filtre par entité spécifique
+        // Rendu du graphe
         // ═══════════════════════════════════════════════════════════════════════
         function refreshGraph() {
             if (!dataLoaded || allEntities.length === 0) {
@@ -756,17 +998,14 @@
             const showCentrality = document.getElementById('showCentralitySize').checked;
             const strongForce = parseInt(document.getElementById('strongLinkForce').value);
             const weakForce = parseInt(document.getElementById('weakLinkForce').value);
-            
-            // NOUVEAU : Filtres par entité spécifique
             const specificEntity = document.getElementById('filterSpecificEntity').value;
             const depth = document.getElementById('relationDepth').value;
-            
+
             let connectedEntityIds = null;
             if (specificEntity !== 'all') {
                 connectedEntityIds = getConnectedEntities(specificEntity, allRelations, depth);
             }
 
-            // Filtrer entités
             const filteredEntities = allEntities.filter(e => {
                 if (!showInactive && !e.Actif) return false;
                 if (filterEnt !== 'all' && e.Type !== filterEnt) return false;
@@ -776,7 +1015,6 @@
 
             const entityIds = new Set(filteredEntities.map(e => e.id));
 
-            // Filtrer relations
             const filteredRelations = allRelations.filter(r => {
                 if (!r.Validé) return false;
                 if (filterRel !== 'all' && r.Type !== parseInt(filterRel)) return false;
@@ -787,30 +1025,27 @@
 
             centralityScores = calculateCentrality(filteredEntities, filteredRelations);
 
-            // Nœuds
             const selectedEntityId = parseInt(specificEntity);
+
+            // ── NŒUDS ──────────────────────────────────────────────────────────
             const nodes = filteredEntities.map(e => {
                 const color = getTypeColor(e.Type);
                 const label = e.Sigle || e.Nom;
-                const typeLabel = getTypeLabel(e.Type);
                 const centrality = centralityScores[e.id]?.normalized || 0;
                 const baseSize = 20;
                 const nodeSize = showCentrality ? baseSize + (centrality * 30) : baseSize;
                 const isSelected = e.id === selectedEntityId;
-                
+
                 return {
                     id: e.id,
                     label: label,
-                    title: `<b>${e.Nom}</b><br>Type: ${typeLabel}<br>Responsable: ${e.Responsable || 'N/A'}<br><br>` +
-                           `<b>Centralité:</b> ${(centrality * 100).toFixed(0)}%<br>` +
-                           `<b>Degré:</b> ${centralityScores[e.id]?.degree || 0}<br>` +
-                           `<b>Score pondéré:</b> ${centralityScores[e.id]?.weighted || 0}` +
-                           (e.Description ? '<br><br>' + e.Description : ''),
+                    // title = null car on gère le tooltip manuellement
+                    title: undefined,
                     color: e.Actif ? color : '#CCCCCC',
                     shape: e.Type === 'D' || e.Type === 'Direction' ? 'box' : 'ellipse',
                     size: isSelected ? nodeSize + 10 : nodeSize,
                     value: centrality * 100,
-                    font: { 
+                    font: {
                         size: isSelected ? Math.max(16, 12 + centrality * 6) : Math.max(12, 12 + centrality * 6),
                         bold: isSelected || (e.Type === 'D' || e.Type === 'Direction') || centrality > 0.7,
                         color: e.Actif ? '#000000' : '#999999'
@@ -820,42 +1055,32 @@
                 };
             });
 
-            // Liens
+            // ── LIENS ──────────────────────────────────────────────────────────
             const edges = filteredRelations.map(r => {
                 const relType = relationTypes.find(t => t.id === r.Type) || {};
-                
                 let springLength, springConstant;
+
                 if (enableIntensity) {
                     switch(r.Intensité) {
-                        case 'Forte':
-                            springLength = strongForce;
-                            springConstant = 0.08;
-                            break;
-                        case 'Moyenne':
-                            springLength = 150;
-                            springConstant = 0.04;
-                            break;
-                        case 'Faible':
-                            springLength = weakForce;
-                            springConstant = 0.02;
-                            break;
-                        default:
-                            springLength = 150;
-                            springConstant = 0.04;
+                        case 'Forte':   springLength = strongForce; springConstant = 0.08; break;
+                        case 'Moyenne': springLength = 150;         springConstant = 0.04; break;
+                        case 'Faible':  springLength = weakForce;   springConstant = 0.02; break;
+                        default:        springLength = 150;         springConstant = 0.04;
                     }
                 } else {
                     springLength = 150;
                     springConstant = 0.04;
                 }
-                
+
                 return {
+                    id: r.id,
                     from: r.Source,
                     to: r.Cible,
                     label: relType.Nom || '',
                     color: { color: relType.Couleur || '#95A5A6' },
                     width: relType.Épaisseur || 1,
                     arrows: r.Bidirectionnel ? 'to, from' : 'to',
-                    title: `${relType.Nom || 'Relation'}<br>Intensité: ${r.Intensité}<br>Longueur: ${springLength}px${r.Commentaire ? '<br><br>' + r.Commentaire : ''}`,
+                    title: undefined,
                     dashes: r.Intensité === 'Faible',
                     length: springLength,
                     smooth: {
@@ -865,26 +1090,16 @@
                 };
             });
 
+            // ── OPTIONS ────────────────────────────────────────────────────────
             const options = {
                 nodes: {
                     borderWidth: 2,
                     borderWidthSelected: 4,
                     shadow: true,
-                    scaling: {
-                        min: 10,
-                        max: 50,
-                        label: {
-                            enabled: true,
-                            min: 12,
-                            max: 20
-                        }
-                    }
+                    scaling: { min: 10, max: 50, label: { enabled: true, min: 12, max: 20 } }
                 },
                 edges: {
-                    smooth: {
-                        type: 'continuous',
-                        roundness: 0.5
-                    },
+                    smooth: { type: 'continuous', roundness: 0.5 },
                     shadow: true
                 },
                 physics: {
@@ -897,38 +1112,72 @@
                         damping: 0.09,
                         avoidOverlap: 0.5
                     },
-                    stabilization: {
-                        enabled: true,
-                        iterations: 300,
-                        updateInterval: 25,
-                        fit: true
-                    },
+                    stabilization: { enabled: true, iterations: 300, updateInterval: 25, fit: true },
                     solver: 'barnesHut',
                     timestep: 0.5
                 },
                 interaction: {
                     hover: true,
-                    tooltipDelay: 200,
+                    tooltipDelay: 99999,   // Désactiver le tooltip natif vis.js
                     navigationButtons: true,
                     keyboard: true,
                     dragView: true,
                     zoomView: true
                 },
-                layout: {
-                    improvedLayout: true,
-                    hierarchical: false
-                }
+                layout: { improvedLayout: true, hierarchical: false }
             };
 
             const container = document.getElementById('mynetwork');
-            const data = { nodes: nodes, edges: edges };
+            const data = { nodes, edges };
 
             if (network) {
                 network.setData(data);
                 network.setOptions(options);
             } else {
                 network = new vis.Network(container, data, options);
-                
+
+                // ── ÉVÉNEMENTS TOOLTIP ────────────────────────────────────────
+                network.on('hoverNode', function(params) {
+                    const entity = allEntities.find(e => e.id === params.node);
+                    if (!entity) return;
+                    const centrality = centralityScores[params.node];
+                    const html = buildNodeTooltip(entity, centrality);
+                    showTooltip(params.event.clientX, params.event.clientY, html);
+                });
+
+                network.on('blurNode', function() {
+                    hideTooltip();
+                });
+
+                network.on('hoverEdge', function(params) {
+                    // Retrouver la relation depuis l'id du edge
+                    const edgeId = params.edge;
+                    const relation = allRelations.find(r => r.id === edgeId);
+                    if (!relation) return;
+                    const relType = relationTypes.find(t => t.id === relation.Type);
+                    const sourceEntity = allEntities.find(e => e.id === relation.Source);
+                    const targetEntity = allEntities.find(e => e.id === relation.Cible);
+                    const html = buildEdgeTooltip(relation, relType, sourceEntity, targetEntity);
+                    showTooltip(params.event.clientX, params.event.clientY, html);
+                });
+
+                network.on('blurEdge', function() {
+                    hideTooltip();
+                });
+
+                // Masquer le tooltip si on clique ailleurs
+                network.on('click', function() {
+                    hideTooltip();
+                });
+
+                network.on('dragStart', function() {
+                    hideTooltip();
+                });
+
+                network.on('zoom', function() {
+                    hideTooltip();
+                });
+
                 network.on('selectNode', function(params) {
                     const entity = allEntities.find(e => e.id === params.nodes[0]);
                     const centrality = centralityScores[params.nodes[0]];
@@ -941,57 +1190,49 @@
                 });
             }
 
+            // Mettre à jour la position du tooltip quand la souris bouge sur le canvas
+            container.addEventListener('mousemove', function(e) {
+                if (tooltip.style.display === 'block') {
+                    const tw = tooltip.offsetWidth;
+                    const th = tooltip.offsetHeight;
+                    const ww = window.innerWidth;
+                    const wh = window.innerHeight;
+                    let left = e.clientX + 15;
+                    let top = e.clientY + 15;
+                    if (left + tw > ww - 20) left = e.clientX - tw - 15;
+                    if (top + th > wh - 20) top = e.clientY - th - 15;
+                    tooltip.style.left = left + 'px';
+                    tooltip.style.top = top + 'px';
+                }
+            });
+
             updateInfoPanel(filteredEntities, filteredRelations);
         }
 
+        // ═══════════════════════════════════════════════════════════════════════
+        // Panneau info
+        // ═══════════════════════════════════════════════════════════════════════
         function updateInfoPanel(filteredEntities, filteredRelations) {
             const metrics = calculateNetworkMetrics(filteredEntities, filteredRelations);
 
             document.getElementById('metricsContent').innerHTML = `
-                <div class="stats-row">
-                    <span>Densité :</span>
-                    <strong>${(metrics.density * 100).toFixed(1)}%</strong>
-                </div>
-                <div class="stats-row">
-                    <span>Degré moyen :</span>
-                    <strong>${metrics.avgDegree.toFixed(1)}</strong>
-                </div>
-                <div class="stats-row">
-                    <span>Liens forts :</span>
-                    <strong>${metrics.strongLinks}</strong>
-                </div>
-                <div class="stats-row">
-                    <span>Liens moyens :</span>
-                    <strong>${metrics.mediumLinks}</strong>
-                </div>
-                <div class="stats-row">
-                    <span>Liens faibles :</span>
-                    <strong>${metrics.weakLinks}</strong>
-                </div>
-                ${metrics.maxConnected ? `
-                <div class="stats-total">
-                    Plus connecté : <strong>${metrics.maxConnected.Nom}</strong> (${metrics.maxConnections} liens)
-                </div>
-                ` : ''}
+                <div class="stats-row"><span>Densité :</span><strong>${(metrics.density * 100).toFixed(1)}%</strong></div>
+                <div class="stats-row"><span>Degré moyen :</span><strong>${metrics.avgDegree.toFixed(1)}</strong></div>
+                <div class="stats-row"><span>Liens forts :</span><strong>${metrics.strongLinks}</strong></div>
+                <div class="stats-row"><span>Liens moyens :</span><strong>${metrics.mediumLinks}</strong></div>
+                <div class="stats-row"><span>Liens faibles :</span><strong>${metrics.weakLinks}</strong></div>
+                ${metrics.maxConnected ? `<div class="stats-total">Plus connecté : <strong>${metrics.maxConnected.Nom}</strong> (${metrics.maxConnections} liens)</div>` : ''}
             `;
 
             document.getElementById('statsContent').innerHTML = `
-                <div class="stats-row">
-                    <span>Entités affichées :</span>
-                    <strong>${filteredEntities.length}</strong>
-                </div>
-                <div class="stats-row">
-                    <span>Relations affichées :</span>
-                    <strong>${filteredRelations.length}</strong>
-                </div>
-                <div class="stats-total">
-                    Total : ${allEntities.length} entités, ${allRelations.length} relations
-                </div>
+                <div class="stats-row"><span>Entités affichées :</span><strong>${filteredEntities.length}</strong></div>
+                <div class="stats-row"><span>Relations affichées :</span><strong>${filteredRelations.length}</strong></div>
+                <div class="stats-total">Total : ${allEntities.length} entités, ${allRelations.length} relations</div>
             `;
 
             const usedTypes = new Set(allEntities.map(e => e.Type).filter(Boolean));
             let entitiesHTML = '';
-            [...usedTypes].sort().forEach(type => {
+            [...usedTypes].sort((a, b) => getTypeLabel(a).localeCompare(getTypeLabel(b), 'fr')).forEach(type => {
                 const color = getTypeColor(type);
                 const label = getTypeLabel(type);
                 const count = allEntities.filter(e => e.Type === type).length;
@@ -999,8 +1240,7 @@
                     <div class="legend-item">
                         <div class="legend-color" style="background: ${color};"></div>
                         <span>${label} (${count})</span>
-                    </div>
-                `;
+                    </div>`;
             });
             document.getElementById('entitiesLegend').innerHTML = entitiesHTML || '<em style="color: #999; font-size: 11px;">Aucune donnée</em>';
 
@@ -1012,16 +1252,17 @@
                         <div class="legend-item">
                             <div class="legend-color" style="background: ${type.Couleur};"></div>
                             <span>${type.Nom} (${count})</span>
-                        </div>
-                    `;
+                        </div>`;
                 }
             });
             document.getElementById('relationsLegend').innerHTML = relationsHTML || '<em style="color: #999; font-size: 11px;">Aucune donnée</em>';
         }
 
+        // ═══════════════════════════════════════════════════════════════════════
+        // Actions
+        // ═══════════════════════════════════════════════════════════════════════
         function resetPhysics() {
             if (network) {
-                log('info', '🔄 Réinitialisation de la physique');
                 network.setOptions({ physics: { enabled: true } });
                 network.stabilize();
                 setTimeout(() => {
@@ -1042,6 +1283,9 @@
             log('success', `📸 Image exportée`);
         }
 
+        // ═══════════════════════════════════════════════════════════════════════
+        // Événements Grist
+        // ═══════════════════════════════════════════════════════════════════════
         grist.onRecords(async function(records) {
             if (dataLoaded) {
                 log('info', '🔔 Mise à jour Grist détectée');
@@ -1049,6 +1293,9 @@
             }
         });
 
+        // ═══════════════════════════════════════════════════════════════════════
+        // Démarrage
+        // ═══════════════════════════════════════════════════════════════════════
         updateForceLabel();
         loadAllData();
     </script>
