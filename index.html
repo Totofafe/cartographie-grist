@@ -789,7 +789,7 @@
                     Description: getColumn(entitiesData, CONFIG.COLONNES.ENTITE_DESC,  i) || '',
                     Responsable: getColumn(entitiesData, CONFIG.COLONNES.ENTITE_RESP,  i) || '',
                     Actif:       getColumn(entitiesData, CONFIG.COLONNES.ENTITE_ACTIF, i) !== false
-					Contact:     getColumn(entitiesData, CONFIG.COLONNES.ENTITE_CONTACT, idx) || ''  // ⬅️ AJOUT
+					Contact:     getColumn(entitiesData, CONFIG.COLONNES.ENTITE_CONTACT, i) || ''  // ⬅️ AJOUT
                 }));
 
                 allRelations = (relationsData.id || []).map((id, i) => ({
