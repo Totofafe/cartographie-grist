@@ -7,11 +7,7 @@
     <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
     <script src="https://unpkg.com/vis-network@9.1.9/standalone/umd/vis-network.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             overflow: hidden;
@@ -29,74 +25,19 @@
             max-height: calc(100vh - 20px);
             overflow-y: auto;
         }
-        #controls h3 {
-            margin: 0 0 10px 0;
-            font-size: 14px;
-            color: #333;
-        }
-        #controls label {
-            display: flex;
-            align-items: center;
-            margin: 8px 0;
-            font-size: 13px;
-            cursor: pointer;
-        }
-        #controls input[type="checkbox"] {
-            margin-right: 8px;
-        }
-        #controls select {
-            width: 100%;
-            padding: 6px;
-            margin-top: 5px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 13px;
-        }
-        #controls button {
-            width: 100%;
-            padding: 8px;
-            margin-top: 10px;
-            background: #3498db;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-        }
-        #controls button:hover {
-            background: #2980b9;
-        }
-        #controls button.debug-btn {
-            background: #666;
-            margin-top: 5px;
-        }
-        #controls button.debug-btn:hover {
-            background: #555;
-        }
-        #controls button.reset-btn {
-            background: #95a5a6;
-            margin-top: 5px;
-        }
-        #controls button.reset-btn:hover {
-            background: #7f8c8d;
-        }
-        .control-section {
-            margin-top: 15px;
-            padding-top: 10px;
-            border-top: 1px solid #e8e8e8;
-        }
-        .control-section-title {
-            font-size: 11px;
-            font-weight: 600;
-            color: #666;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-        }
-        #mynetwork {
-            width: 100vw;
-            height: 100vh;
-            background: #f8f9fa;
-        }
+        #controls h3 { margin: 0 0 10px 0; font-size: 14px; color: #333; }
+        #controls label { display: flex; align-items: center; margin: 8px 0; font-size: 13px; cursor: pointer; }
+        #controls input[type="checkbox"] { margin-right: 8px; }
+        #controls select { width: 100%; padding: 6px; margin-top: 5px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; }
+        #controls button { width: 100%; padding: 8px; margin-top: 10px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; }
+        #controls button:hover { background: #2980b9; }
+        #controls button.debug-btn { background: #666; margin-top: 5px; }
+        #controls button.debug-btn:hover { background: #555; }
+        #controls button.reset-btn { background: #95a5a6; margin-top: 5px; }
+        #controls button.reset-btn:hover { background: #7f8c8d; }
+        .control-section { margin-top: 15px; padding-top: 10px; border-top: 1px solid #e8e8e8; }
+        .control-section-title { font-size: 11px; font-weight: 600; color: #666; margin-bottom: 8px; text-transform: uppercase; }
+        #mynetwork { width: 100vw; height: 100vh; background: #f8f9fa; }
         #info-panel {
             position: absolute;
             top: 10px;
@@ -110,120 +51,37 @@
             overflow-y: auto;
             z-index: 1000;
         }
-        #info-panel h3 {
-            margin: 0 0 10px 0;
-            font-size: 14px;
-            color: #333;
-        }
-        .info-section {
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #e8e8e8;
-        }
-        .info-section:last-child {
-            margin-bottom: 0;
-            padding-bottom: 0;
-            border-bottom: none;
-        }
-        .info-section h4 {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-        .legend-item {
-            display: flex;
-            align-items: center;
-            margin: 6px 0;
-            font-size: 12px;
-        }
-        .legend-color {
-            width: 18px;
-            height: 18px;
-            margin-right: 10px;
-            border-radius: 3px;
-            border: 1px solid #ddd;
-            flex-shrink: 0;
-        }
-        .stats-row {
-            display: flex;
-            justify-content: space-between;
-            margin: 5px 0;
-            font-size: 12px;
-            color: #666;
-        }
-        .stats-row strong {
-            color: #333;
-        }
-        .stats-total {
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid #e8e8e8;
-            font-size: 11px;
-            color: #999;
-        }
-        .badge {
-            display: inline-block;
-            padding: 2px 6px;
-            background: #e8e8e8;
-            border-radius: 3px;
-            font-size: 10px;
-            font-weight: 600;
-            margin-left: 5px;
-        }
-        .badge.new {
-            background: #3498db;
-            color: white;
-        }
+        #info-panel h3 { margin: 0 0 10px 0; font-size: 14px; color: #333; }
+        .info-section { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e8e8e8; }
+        .info-section:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+        .info-section h4 { font-size: 12px; color: #666; margin-bottom: 8px; font-weight: 600; }
+        .legend-item { display: flex; align-items: center; margin: 6px 0; font-size: 12px; }
+        .legend-color { width: 18px; height: 18px; margin-right: 10px; border-radius: 3px; border: 1px solid #ddd; flex-shrink: 0; }
+        .stats-row { display: flex; justify-content: space-between; margin: 5px 0; font-size: 12px; color: #666; }
+        .stats-row strong { color: #333; }
+        .stats-total { margin-top: 10px; padding-top: 10px; border-top: 1px solid #e8e8e8; font-size: 11px; color: #999; }
+        .badge { display: inline-block; padding: 2px 6px; background: #e8e8e8; border-radius: 3px; font-size: 10px; font-weight: 600; margin-left: 5px; }
+        .badge.new { background: #3498db; color: white; }
         #loading {
-            position: absolute;
-            top: 50%;
-            left: 50%;
+            position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.2);
-            text-align: center;
-            z-index: 2000;
+            background: white; padding: 30px; border-radius: 8px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.2); text-align: center; z-index: 2000;
         }
-        #loading.hidden {
-            display: none;
-        }
+        #loading.hidden { display: none; }
         .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #3498db;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
+            border: 3px solid #f3f3f3; border-top: 3px solid #3498db;
+            border-radius: 50%; width: 40px; height: 40px;
+            animation: spin 1s linear infinite; margin: 0 auto 15px;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         #debug {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            background: rgba(0, 0, 0, 0.9);
-            color: #0f0;
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 10px;
-            font-family: 'Courier New', monospace;
-            max-width: 500px;
-            max-height: 300px;
-            overflow-y: auto;
-            z-index: 2000;
-            display: none;
+            position: absolute; bottom: 10px; left: 10px;
+            background: rgba(0,0,0,0.9); color: #0f0; padding: 10px;
+            border-radius: 6px; font-size: 10px; font-family: 'Courier New', monospace;
+            max-width: 500px; max-height: 300px; overflow-y: auto; z-index: 2000; display: none;
         }
-        #debug div {
-            margin: 2px 0;
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
+        #debug div { margin: 2px 0; white-space: pre-wrap; word-break: break-word; }
         .debug-error { color: #ff6b6b; }
         .debug-success { color: #51cf66; }
         .debug-info { color: #74c0fc; }
@@ -233,135 +91,36 @@
            TOOLTIP PERSONNALISÉ
         ═══════════════════════════════════════════════════ */
         #custom-tooltip {
-            position: fixed;
-            z-index: 9999;
-            pointer-events: none;
-            display: none;
-            max-width: 280px;
+            position: fixed; z-index: 9999; pointer-events: none;
+            display: none; max-width: 280px;
             filter: drop-shadow(0 4px 12px rgba(0,0,0,0.2));
         }
-        .tooltip-node {
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 1px solid #e0e0e0;
-        }
-        .tooltip-header {
-            padding: 10px 14px;
-            color: white;
-        }
-        .tooltip-header .tooltip-nom {
-            font-size: 14px;
-            font-weight: 700;
-            line-height: 1.3;
-        }
-        .tooltip-header .tooltip-sigle {
-            font-size: 11px;
-            opacity: 0.85;
-            margin-top: 2px;
-        }
-        .tooltip-body {
-            padding: 10px 14px;
-        }
-        .tooltip-row {
-            display: flex;
-            margin: 5px 0;
-            font-size: 12px;
-        }
-        .tooltip-row .t-label {
-            color: #888;
-            min-width: 90px;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-            padding-top: 1px;
-        }
-        .tooltip-row .t-value {
-            color: #2c3e50;
-            font-weight: 500;
-            flex: 1;
-        }
-        .tooltip-metrics {
-            display: flex;
-            gap: 6px;
-            margin-top: 10px;
-            padding-top: 8px;
-            border-top: 1px solid #f0f0f0;
-        }
-        .tooltip-metric {
-            flex: 1;
-            background: #f8f9fa;
-            border-radius: 6px;
-            padding: 5px 8px;
-            text-align: center;
-        }
-        .tooltip-metric .m-value {
-            font-size: 15px;
-            font-weight: 700;
-            color: #2c3e50;
-            display: block;
-        }
-        .tooltip-metric .m-label {
-            font-size: 10px;
-            color: #888;
-            text-transform: uppercase;
-        }
-        .tooltip-desc {
-            margin-top: 8px;
-            padding: 7px 10px;
-            background: #f8f9fa;
-            border-radius: 6px;
-            font-size: 11px;
-            color: #666;
-            line-height: 1.5;
-            font-style: italic;
-        }
-        /* Tooltip lien */
-        .tooltip-edge {
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 1px solid #e0e0e0;
-        }
-        .tooltip-edge-header {
-            padding: 10px 14px;
-            color: white;
-        }
-        .tooltip-edge-header .edge-type {
-            font-size: 13px;
-            font-weight: 700;
-        }
-        .tooltip-edge-header .edge-arrow {
-            font-size: 11px;
-            opacity: 0.85;
-            margin-top: 3px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .edge-entity {
-            background: rgba(255,255,255,0.2);
-            padding: 1px 6px;
-            border-radius: 3px;
-        }
-        .tooltip-intensite {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 11px;
-            font-weight: 600;
-            color: white;
-        }
+        .tooltip-node { background: white; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; }
+        .tooltip-header { padding: 10px 14px; color: white; }
+        .tooltip-header .tooltip-nom { font-size: 14px; font-weight: 700; line-height: 1.3; }
+        .tooltip-header .tooltip-sigle { font-size: 11px; opacity: 0.85; margin-top: 2px; }
+        .tooltip-body { padding: 10px 14px; }
+        .tooltip-row { display: flex; margin: 5px 0; font-size: 12px; }
+        .tooltip-row .t-label { color: #888; min-width: 90px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px; padding-top: 1px; }
+        .tooltip-row .t-value { color: #2c3e50; font-weight: 500; flex: 1; }
+        .tooltip-metrics { display: flex; gap: 6px; margin-top: 10px; padding-top: 8px; border-top: 1px solid #f0f0f0; }
+        .tooltip-metric { flex: 1; background: #f8f9fa; border-radius: 6px; padding: 5px 8px; text-align: center; }
+        .tooltip-metric .m-value { font-size: 15px; font-weight: 700; color: #2c3e50; display: block; }
+        .tooltip-metric .m-label { font-size: 10px; color: #888; text-transform: uppercase; }
+        .tooltip-desc { margin-top: 8px; padding: 7px 10px; background: #f8f9fa; border-radius: 6px; font-size: 11px; color: #666; line-height: 1.5; font-style: italic; }
+        .tooltip-edge { background: white; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; }
+        .tooltip-edge-header { padding: 10px 14px; color: white; }
+        .tooltip-edge-header .edge-type { font-size: 13px; font-weight: 700; }
+        .tooltip-edge-header .edge-arrow { font-size: 11px; opacity: 0.85; margin-top: 3px; display: flex; align-items: center; gap: 6px; }
+        .edge-entity { background: rgba(255,255,255,0.2); padding: 1px 6px; border-radius: 3px; }
+        .tooltip-intensite { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; color: white; }
         .intensite-forte   { background: #e74c3c; }
         .intensite-moyenne { background: #f39c12; }
         .intensite-faible  { background: #95a5a6; }
 
-        #info-panel::-webkit-scrollbar,
-        #controls::-webkit-scrollbar { width: 6px; }
-        #info-panel::-webkit-scrollbar-track,
-        #controls::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 3px; }
-        #info-panel::-webkit-scrollbar-thumb,
-        #controls::-webkit-scrollbar-thumb { background: #888; border-radius: 3px; }
+        #info-panel::-webkit-scrollbar, #controls::-webkit-scrollbar { width: 6px; }
+        #info-panel::-webkit-scrollbar-track, #controls::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 3px; }
+        #info-panel::-webkit-scrollbar-thumb, #controls::-webkit-scrollbar-thumb { background: #888; border-radius: 3px; }
     </style>
 </head>
 <body>
@@ -397,16 +156,12 @@
 
         <div style="margin-top: 10px;">
             <label style="display: block; margin-bottom: 3px; font-size: 11px; font-weight: 600;">Type de relation :</label>
-            <select id="filterRelation">
-                <option value="all">Toutes</option>
-            </select>
+            <select id="filterRelation"><option value="all">Toutes</option></select>
         </div>
 
         <div style="margin-top: 10px;">
             <label style="display: block; margin-bottom: 3px; font-size: 11px; font-weight: 600;">Type d'entité :</label>
-            <select id="filterEntity">
-                <option value="all">Toutes</option>
-            </select>
+            <select id="filterEntity"><option value="all">Toutes</option></select>
         </div>
 
         <!-- Layout Phase 1 -->
@@ -443,7 +198,6 @@
 
     <div id="mynetwork"></div>
 
-    <!-- Panneau info -->
     <div id="info-panel">
         <h3>📊 Informations</h3>
         <div class="info-section">
@@ -471,9 +225,7 @@
         </div>
     </div>
 
-    <!-- Tooltip personnalisé -->
     <div id="custom-tooltip"></div>
-
     <div id="debug"></div>
 
     <script>
@@ -487,23 +239,23 @@
                 TYPES_RELATIONS: 'TYPES_RELATIONS'
             },
             COLONNES: {
-                ENTITE_NOM:     'Nom',
-                ENTITE_SIGLE:   'Sigle',
-                ENTITE_TYPE:    'Type_',
-                ENTITE_DESC:    'Description',
-                ENTITE_RESP:    'Responsable',
-                ENTITE_ACTIF:   'Actif',
-				ENTITE_CONTACT:  'Contact',    // ⬅️ AJOUT
-                REL_SOURCE:     'Source_',
-                REL_CIBLE:      'Cible_',
-                REL_TYPE:       'Type_',
-                REL_INTENSITE:  'Intensite',
-                REL_BIDIRECT:   'Bidirectionnel',
-                REL_COMMENT:    'Commentaire',
-                REL_VALIDE:     'Valide',
-                TYPE_NOM:       'Nom_',
-                TYPE_COULEUR:   'Couleur_',
-                TYPE_EPAISSEUR: 'Epaisseur_'
+                ENTITE_NOM:      'Nom',
+                ENTITE_SIGLE:    'Sigle',
+                ENTITE_TYPE:     'Type_',
+                ENTITE_DESC:     'Description',
+                ENTITE_RESP:     'Responsable',
+                ENTITE_ACTIF:    'Actif',
+                ENTITE_CONTACT:  'Contact',  // ✅ Correctement déclaré
+                REL_SOURCE:      'Source_',
+                REL_CIBLE:       'Cible_',
+                REL_TYPE:        'Type_',
+                REL_INTENSITE:   'Intensite',
+                REL_BIDIRECT:    'Bidirectionnel',
+                REL_COMMENT:     'Commentaire',
+                REL_VALIDE:      'Valide',
+                TYPE_NOM:        'Nom_',
+                TYPE_COULEUR:    'Couleur_',
+                TYPE_EPAISSEUR:  'Epaisseur_'
             }
         };
 
@@ -565,12 +317,11 @@
             tooltipEl.style.top  = top  + 'px';
         }
 
-        // Déplacer le tooltip avec la souris
         document.getElementById('mynetwork').addEventListener('mousemove', function(e) {
             if (tooltipVisible) positionTooltip(e.clientX, e.clientY);
         });
 
-        // ─── Contenu tooltip NŒUD ───────────────────────────────────────────
+        // ─── Tooltip NŒUD ───────────────────────────────────────────────────
         function buildNodeTooltip(entity) {
             const color    = getTypeColor(entity.Type);
             const label    = getTypeLabel(entity.Type);
@@ -597,6 +348,21 @@
                 </div>`;
             }
 
+            // ✅ Ligne Contact avec mailto cliquable
+            if (entity.Contact) {
+                html += `<div class="tooltip-row">
+                    <span class="t-label">Contact</span>
+                    <span class="t-value">
+                        <a href="mailto:${entity.Contact}"
+                           style="color:#3498db; text-decoration:none;"
+                           onmouseover="this.style.textDecoration='underline'"
+                           onmouseout="this.style.textDecoration='none'">
+                            ${entity.Contact}
+                        </a>
+                    </span>
+                </div>`;
+            }
+
             html += `<div class="tooltip-metrics">
                     <div class="tooltip-metric">
                         <span class="m-value">${pct}%</span>
@@ -620,18 +386,17 @@
             return html;
         }
 
-        // ─── Contenu tooltip LIEN ────────────────────────────────────────────
+        // ─── Tooltip LIEN ────────────────────────────────────────────────────
         function buildEdgeTooltip(relation) {
-            const relType  = relationTypes.find(t => t.id === relation.Type) || {};
-            const color    = relType.Couleur || '#34495e';
-            const src      = allEntities.find(e => e.id === relation.Source);
-            const tgt      = allEntities.find(e => e.id === relation.Cible);
+            const relType   = relationTypes.find(t => t.id === relation.Type) || {};
+            const color     = relType.Couleur || '#34495e';
+            const src       = allEntities.find(e => e.id === relation.Source);
+            const tgt       = allEntities.find(e => e.id === relation.Cible);
             const intensite = relation.Intensité || 'Moyenne';
-            const iClass   = intensite === 'Forte'  ? 'intensite-forte'  :
-                             intensite === 'Faible' ? 'intensite-faible' :
-                                                      'intensite-moyenne';
+            const iClass    = intensite === 'Forte'  ? 'intensite-forte'  :
+                              intensite === 'Faible' ? 'intensite-faible' : 'intensite-moyenne';
 
-            let html = `<div class="tooltip-edge">
+            return `<div class="tooltip-edge">
                 <div class="tooltip-edge-header" style="background:${color};">
                     <div class="edge-type">${relType.Nom || 'Relation'}</div>
                     <div class="edge-arrow">
@@ -664,16 +429,15 @@
                     <div class="tooltip-desc">${relation.Commentaire}</div>` : ''}
                 </div>
             </div>`;
-            return html;
         }
 
         // ═══════════════════════════════════════════════════════════════════════
-        // Entités connectées (filtre par niveau)
+        // Entités connectées
         // ═══════════════════════════════════════════════════════════════════════
         function getConnectedEntities(entityId, relations, maxDepth) {
             if (!entityId || maxDepth === 'all') return null;
-            const connected   = new Set([parseInt(entityId)]);
-            let currentLevel  = new Set([parseInt(entityId)]);
+            const connected  = new Set([parseInt(entityId)]);
+            let currentLevel = new Set([parseInt(entityId)]);
             for (let d = 0; d < parseInt(maxDepth); d++) {
                 const nextLevel = new Set();
                 currentLevel.forEach(nodeId => {
@@ -781,26 +545,27 @@
                 ]);
                 if (!entitiesData.id?.length) throw new Error(`Table ${CONFIG.TABLES.ENTITES} vide`);
 
+                // ✅ CORRECTION : virgule ajoutée après Actif
                 allEntities = entitiesData.id.map((id, i) => ({
                     id,
-                    Nom:         getColumn(entitiesData, CONFIG.COLONNES.ENTITE_NOM,   i) || '',
-                    Sigle:       getColumn(entitiesData, CONFIG.COLONNES.ENTITE_SIGLE, i) || '',
-                    Type:        getColumn(entitiesData, CONFIG.COLONNES.ENTITE_TYPE,  i) || '',
-                    Description: getColumn(entitiesData, CONFIG.COLONNES.ENTITE_DESC,  i) || '',
-                    Responsable: getColumn(entitiesData, CONFIG.COLONNES.ENTITE_RESP,  i) || '',
-                    Actif:       getColumn(entitiesData, CONFIG.COLONNES.ENTITE_ACTIF, i) !== false,
-					Contact:     getColumn(entitiesData, CONFIG.COLONNES.ENTITE_CONTACT, i) || ''  // ⬅️ AJOUT
+                    Nom:         getColumn(entitiesData, CONFIG.COLONNES.ENTITE_NOM,     i) || '',
+                    Sigle:       getColumn(entitiesData, CONFIG.COLONNES.ENTITE_SIGLE,   i) || '',
+                    Type:        getColumn(entitiesData, CONFIG.COLONNES.ENTITE_TYPE,    i) || '',
+                    Description: getColumn(entitiesData, CONFIG.COLONNES.ENTITE_DESC,    i) || '',
+                    Responsable: getColumn(entitiesData, CONFIG.COLONNES.ENTITE_RESP,    i) || '',
+                    Actif:       getColumn(entitiesData, CONFIG.COLONNES.ENTITE_ACTIF,   i) !== false,  // ✅ VIRGULE
+                    Contact:     getColumn(entitiesData, CONFIG.COLONNES.ENTITE_CONTACT, i) || ''
                 }));
 
                 allRelations = (relationsData.id || []).map((id, i) => ({
                     id,
-                    Source:         getColumn(relationsData, CONFIG.COLONNES.REL_SOURCE,   i),
-                    Cible:          getColumn(relationsData, CONFIG.COLONNES.REL_CIBLE,    i),
-                    Type:           getColumn(relationsData, CONFIG.COLONNES.REL_TYPE,     i),
-                    Intensité:      getColumn(relationsData, CONFIG.COLONNES.REL_INTENSITE,i) || 'Moyenne',
-                    Bidirectionnel: getColumn(relationsData, CONFIG.COLONNES.REL_BIDIRECT, i) || false,
-                    Commentaire:    getColumn(relationsData, CONFIG.COLONNES.REL_COMMENT,  i) || '',
-                    Validé:         getColumn(relationsData, CONFIG.COLONNES.REL_VALIDE,   i) !== false
+                    Source:         getColumn(relationsData, CONFIG.COLONNES.REL_SOURCE,    i),
+                    Cible:          getColumn(relationsData, CONFIG.COLONNES.REL_CIBLE,     i),
+                    Type:           getColumn(relationsData, CONFIG.COLONNES.REL_TYPE,      i),
+                    Intensité:      getColumn(relationsData, CONFIG.COLONNES.REL_INTENSITE, i) || 'Moyenne',
+                    Bidirectionnel: getColumn(relationsData, CONFIG.COLONNES.REL_BIDIRECT,  i) || false,
+                    Commentaire:    getColumn(relationsData, CONFIG.COLONNES.REL_COMMENT,   i) || '',
+                    Validé:         getColumn(relationsData, CONFIG.COLONNES.REL_VALIDE,    i) !== false
                 }));
 
                 relationTypes = (typesData.id || []).map((id, i) => ({
@@ -846,7 +611,6 @@
             // ─── Entité spécifique (tri par sigle) ─────────────────────────────
             const specificSel = document.getElementById('filterSpecificEntity');
             specificSel.innerHTML = '<option value="all">Vue complète</option>';
-
             [...allEntities]
                 .sort((a, b) => (a.Sigle || a.Nom || '').localeCompare(b.Sigle || b.Nom || '', 'fr'))
                 .forEach(entity => {
@@ -906,7 +670,6 @@
                 document.getElementById('showInactive').addEventListener('change', refreshGraph);
                 document.getElementById('showInactive').dataset.init = '1';
             }
-
             log('success', '✅ Filtres initialisés');
         }
 
@@ -916,15 +679,15 @@
         function refreshGraph() {
             if (!dataLoaded || allEntities.length === 0) return;
 
-            const showInactive     = document.getElementById('showInactive').checked;
-            const filterRel        = document.getElementById('filterRelation').value;
-            const filterEnt        = document.getElementById('filterEntity').value;
-            const enableIntensity  = document.getElementById('enableIntensityLayout').checked;
-            const showCentrality   = document.getElementById('showCentralitySize').checked;
-            const strongForce      = parseInt(document.getElementById('strongLinkForce').value);
-            const weakForce        = parseInt(document.getElementById('weakLinkForce').value);
-            const specificEntity   = document.getElementById('filterSpecificEntity').value;
-            const depth            = document.getElementById('relationDepth').value;
+            const showInactive    = document.getElementById('showInactive').checked;
+            const filterRel       = document.getElementById('filterRelation').value;
+            const filterEnt       = document.getElementById('filterEntity').value;
+            const enableIntensity = document.getElementById('enableIntensityLayout').checked;
+            const showCentrality  = document.getElementById('showCentralitySize').checked;
+            const strongForce     = parseInt(document.getElementById('strongLinkForce').value);
+            const weakForce       = parseInt(document.getElementById('weakLinkForce').value);
+            const specificEntity  = document.getElementById('filterSpecificEntity').value;
+            const depth           = document.getElementById('relationDepth').value;
 
             let connectedIds = null;
             if (specificEntity !== 'all') {
@@ -949,75 +712,28 @@
             centralityScores = calculateCentrality(filteredEntities, filteredRelations);
 
             // ─── Nœuds ─────────────────────────────────────────────────────────
-const nodes = filteredEntities.map(e => {
-    const color = getTypeColor(e.Type);
-    const label = e.Sigle || e.Nom;
-    const typeLabel = getTypeLabel(e.Type);
-    const centrality = centralityScores[e.id]?.normalized || 0;
-    const baseSize = 20;
-    const nodeSize = showCentrality ? baseSize + (centrality * 30) : baseSize;
+            const nodes = filteredEntities.map(e => {
+                const color      = getTypeColor(e.Type);
+                const centrality = centralityScores[e.id]?.normalized || 0;
+                const nodeSize   = showCentrality ? 20 + (centrality * 30) : 20;
 
-    // ─── Construction du tooltip ────────────────────────────────────────
-    // Ligne Contact avec mailto cliquable
-    const contactLine = e.Contact ? 
-        `<br><b>Contact :</b> <a href="mailto:${e.Contact}" 
-            style="color: #3498db; text-decoration: none;"
-            title="Envoyer un email à ${e.Contact}">
-            ${e.Contact}
-        </a>` : '';
-
-    return {
-        id: e.id,
-        label: label,
-        title: `<div style="font-family: sans-serif; font-size: 13px; max-width: 280px; line-height: 1.6;">
-                    <div style="font-weight: 700; font-size: 14px; color: #2c3e50; 
-                                border-bottom: 2px solid ${color}; padding-bottom: 5px; margin-bottom: 8px;">
-                        ${e.Nom}
-                    </div>
-                    <div style="color: #666; margin: 4px 0;">
-                        <b style="color: #333;">Type :</b> ${typeLabel}
-                    </div>
-                    <div style="color: #666; margin: 4px 0;">
-                        <b style="color: #333;">Responsable :</b> ${e.Responsable || 'N/A'}
-                    </div>
-                    <div style="color: #666; margin: 4px 0;">
-                        <b style="color: #333;">Contact :</b> ${
-                            e.Contact ? 
-                            `<a href="mailto:${e.Contact}" 
-                                style="color: #3498db; text-decoration: none;"
-                                onmouseover="this.style.textDecoration='underline'"
-                                onmouseout="this.style.textDecoration='none'">
-                                ${e.Contact}
-                            </a>` : 
-                            '<em style="color: #999;">Non renseigné</em>'
-                        }
-                    </div>
-                    <div style="margin-top: 8px; padding-top: 8px; 
-                                border-top: 1px solid #eee; font-size: 11px; color: #888;">
-                        <b>Centralité :</b> ${(centrality * 100).toFixed(0)}% &nbsp;|&nbsp;
-                        <b>Degré :</b> ${centralityScores[e.id]?.degree || 0} &nbsp;|&nbsp;
-                        <b>Score :</b> ${centralityScores[e.id]?.weighted || 0}
-                    </div>
-                    ${e.Description ? `
-                    <div style="margin-top: 8px; padding: 6px 8px; background: #f8f9fa; 
-                                border-radius: 4px; font-size: 11px; color: #666; 
-                                font-style: italic;">
-                        ${e.Description}
-                    </div>` : ''}
-                </div>`,
-        color: e.Actif ? color : '#CCCCCC',
-        shape: e.Type === 'D' || e.Type === 'Direction' ? 'box' : 'ellipse',
-        size: nodeSize,
-        value: centrality * 100,
-        font: { 
-            size: Math.max(12, 12 + centrality * 6),
-            bold: (e.Type === 'D' || e.Type === 'Direction') || centrality > 0.7,
-            color: e.Actif ? '#000000' : '#999999'
-        },
-        borderWidth: e.Actif ? 2 + Math.floor(centrality * 2) : 1,
-        opacity: e.Actif ? 1 : 0.5
-    };
-});
+                return {
+                    id:          e.id,
+                    label:       e.Sigle || e.Nom,
+                    title:       '',   // Tooltip géré manuellement
+                    color:       e.Actif ? color : '#CCCCCC',
+                    shape:       e.Type === 'D' || e.Type === 'Direction' ? 'box' : 'ellipse',
+                    size:        nodeSize,
+                    value:       centrality * 100,
+                    font: {
+                        size:  Math.max(12, 12 + centrality * 6),
+                        bold:  (e.Type === 'D' || e.Type === 'Direction') || centrality > 0.7,
+                        color: e.Actif ? '#000000' : '#999999'
+                    },
+                    borderWidth: e.Actif ? 2 + Math.floor(centrality * 2) : 1,
+                    opacity:     e.Actif ? 1 : 0.5
+                };
+            });
 
             // ─── Liens ─────────────────────────────────────────────────────────
             const edges = filteredRelations.map(r => {
@@ -1032,7 +748,6 @@ const nodes = filteredEntities.map(e => {
                     from:   r.Source,
                     to:     r.Cible,
                     label:  relType.Nom || '',
-                    // title vide : tooltip manuel
                     title:  '',
                     color:  { color: relType.Couleur || '#95A5A6' },
                     width:  relType.Épaisseur || 1,
@@ -1065,7 +780,7 @@ const nodes = filteredEntities.map(e => {
                 },
                 interaction: {
                     hover: true,
-                    tooltipDelay: 99999,   // ← Désactive le tooltip natif de vis.js
+                    tooltipDelay: 99999,
                     navigationButtons: true,
                     keyboard: true,
                     dragView: true,
@@ -1083,26 +798,17 @@ const nodes = filteredEntities.map(e => {
             } else {
                 network = new vis.Network(container, data, options);
 
-                // ── Événements tooltip ──────────────────────────────────────────
                 network.on('hoverNode', function (params) {
                     const entity = allEntities.find(e => e.id === params.node);
                     if (!entity) return;
-                    showTooltip(
-                        params.pointer.DOM.x,
-                        params.pointer.DOM.y,
-                        buildNodeTooltip(entity)
-                    );
+                    showTooltip(params.pointer.DOM.x, params.pointer.DOM.y, buildNodeTooltip(entity));
                 });
                 network.on('blurNode', hideTooltip);
 
                 network.on('hoverEdge', function (params) {
                     const relation = allRelations.find(r => r.id === params.edge);
                     if (!relation) return;
-                    showTooltip(
-                        params.pointer.DOM.x,
-                        params.pointer.DOM.y,
-                        buildEdgeTooltip(relation)
-                    );
+                    showTooltip(params.pointer.DOM.x, params.pointer.DOM.y, buildEdgeTooltip(relation));
                 });
                 network.on('blurEdge', hideTooltip);
 
