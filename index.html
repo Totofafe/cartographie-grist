@@ -493,6 +493,7 @@
                 ENTITE_DESC:    'Description',
                 ENTITE_RESP:    'Responsable',
                 ENTITE_ACTIF:   'Actif',
+				ENTITE_CONTACT:  'Contact',    // ⬅️ AJOUT
                 REL_SOURCE:     'Source_',
                 REL_CIBLE:      'Cible_',
                 REL_TYPE:       'Type_',
@@ -795,6 +796,7 @@
                     Description: getColumn(entitiesData, CONFIG.COLONNES.ENTITE_DESC,  i) || '',
                     Responsable: getColumn(entitiesData, CONFIG.COLONNES.ENTITE_RESP,  i) || '',
                     Actif:       getColumn(entitiesData, CONFIG.COLONNES.ENTITE_ACTIF, i) !== false
+					Contact:     getColumn(entitiesData, CONFIG.COLONNES.ENTITE_CONTACT, idx) || ''  // ⬅️ AJOUT
                 }));
 
                 allRelations = (relationsData.id || []).map((id, i) => ({
