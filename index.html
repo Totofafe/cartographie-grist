@@ -229,103 +229,86 @@
         .debug-info { color: #74c0fc; }
         .debug-warning { color: #ffd43b; }
 
-        /* ═══════════════════════════════════════════════════════════════
+        /* ═══════════════════════════════════════════════════
            TOOLTIP PERSONNALISÉ
-        ═══════════════════════════════════════════════════════════════ */
+        ═══════════════════════════════════════════════════ */
         #custom-tooltip {
             position: fixed;
-            background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 0;
-            font-size: 13px;
-            pointer-events: none;
             z-index: 9999;
+            pointer-events: none;
             display: none;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            max-width: 300px;
-            min-width: 220px;
+            max-width: 280px;
+            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.2));
+        }
+        .tooltip-node {
+            background: white;
+            border-radius: 8px;
             overflow: hidden;
+            border: 1px solid #e0e0e0;
         }
         .tooltip-header {
-            background: #2c3e50;
-            color: white;
             padding: 10px 14px;
-            border-radius: 8px 8px 0 0;
+            color: white;
         }
-        .tooltip-header .tooltip-name {
+        .tooltip-header .tooltip-nom {
             font-size: 14px;
             font-weight: 700;
-            margin-bottom: 2px;
+            line-height: 1.3;
         }
         .tooltip-header .tooltip-sigle {
             font-size: 11px;
-            opacity: 0.7;
-            font-style: italic;
+            opacity: 0.85;
+            margin-top: 2px;
         }
         .tooltip-body {
             padding: 10px 14px;
         }
         .tooltip-row {
             display: flex;
-            align-items: flex-start;
-            margin: 6px 0;
+            margin: 5px 0;
             font-size: 12px;
         }
-        .tooltip-row .tooltip-label {
+        .tooltip-row .t-label {
             color: #888;
+            min-width: 90px;
             font-size: 11px;
             text-transform: uppercase;
-            letter-spacing: 0.4px;
-            min-width: 85px;
+            letter-spacing: 0.3px;
             padding-top: 1px;
-            flex-shrink: 0;
         }
-        .tooltip-row .tooltip-value {
+        .tooltip-row .t-value {
             color: #2c3e50;
-            font-weight: 600;
+            font-weight: 500;
             flex: 1;
-        }
-        .tooltip-type-badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 11px;
-            font-weight: 600;
-            color: white;
-        }
-        .tooltip-divider {
-            height: 1px;
-            background: #f0f0f0;
-            margin: 8px 0;
         }
         .tooltip-metrics {
             display: flex;
-            gap: 8px;
-            margin-top: 8px;
+            gap: 6px;
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px solid #f0f0f0;
         }
-        .tooltip-metric-box {
+        .tooltip-metric {
             flex: 1;
             background: #f8f9fa;
             border-radius: 6px;
-            padding: 6px 8px;
+            padding: 5px 8px;
             text-align: center;
         }
-        .tooltip-metric-box .metric-value {
-            font-size: 16px;
+        .tooltip-metric .m-value {
+            font-size: 15px;
             font-weight: 700;
             color: #2c3e50;
             display: block;
         }
-        .tooltip-metric-box .metric-label {
+        .tooltip-metric .m-label {
             font-size: 10px;
             color: #888;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
         }
-        .tooltip-description {
+        .tooltip-desc {
             margin-top: 8px;
-            padding: 8px 10px;
+            padding: 7px 10px;
             background: #f8f9fa;
             border-radius: 6px;
             font-size: 11px;
@@ -333,35 +316,33 @@
             line-height: 1.5;
             font-style: italic;
         }
-        /* Tooltip pour les liens */
-        .tooltip-edge-header {
-            background: #34495e;
-            color: white;
-            padding: 10px 14px;
-            border-radius: 8px 8px 0 0;
+        /* Tooltip lien */
+        .tooltip-edge {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e0e0e0;
         }
-        .tooltip-edge-header .tooltip-edge-type {
+        .tooltip-edge-header {
+            padding: 10px 14px;
+            color: white;
+        }
+        .tooltip-edge-header .edge-type {
             font-size: 13px;
             font-weight: 700;
         }
-        .tooltip-arrow {
+        .tooltip-edge-header .edge-arrow {
+            font-size: 11px;
+            opacity: 0.85;
+            margin-top: 3px;
             display: flex;
             align-items: center;
             gap: 6px;
-            margin-top: 8px;
-            font-size: 12px;
         }
-        .tooltip-arrow .arrow-entity {
-            background: #ecf0f1;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-weight: 600;
-            color: #2c3e50;
-            font-size: 11px;
-        }
-        .tooltip-arrow .arrow-sym {
-            color: white;
-            font-size: 14px;
+        .edge-entity {
+            background: rgba(255,255,255,0.2);
+            padding: 1px 6px;
+            border-radius: 3px;
         }
         .tooltip-intensite {
             display: inline-block;
@@ -370,11 +351,10 @@
             font-size: 11px;
             font-weight: 600;
             color: white;
-            margin-top: 6px;
         }
-        .intensite-forte { background: #e74c3c; }
+        .intensite-forte   { background: #e74c3c; }
         .intensite-moyenne { background: #f39c12; }
-        .intensite-faible { background: #95a5a6; }
+        .intensite-faible  { background: #95a5a6; }
 
         #info-panel::-webkit-scrollbar,
         #controls::-webkit-scrollbar { width: 6px; }
@@ -382,8 +362,6 @@
         #controls::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 3px; }
         #info-panel::-webkit-scrollbar-thumb,
         #controls::-webkit-scrollbar-thumb { background: #888; border-radius: 3px; }
-        #info-panel::-webkit-scrollbar-thumb:hover,
-        #controls::-webkit-scrollbar-thumb:hover { background: #555; }
     </style>
 </head>
 <body>
@@ -394,75 +372,68 @@
 
     <div id="controls">
         <h3>🎛️ Contrôles</h3>
-        
-        <!-- Filtre par entité spécifique -->
+
+        <!-- Filtre entité spécifique -->
         <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 2px solid #3498db;">
             <label style="display: block; margin-bottom: 3px; font-size: 11px; font-weight: 600;">🎯 Centrer sur une entité :</label>
             <select id="filterSpecificEntity">
                 <option value="all">Vue complète</option>
             </select>
-            
             <div id="depthControl" style="margin-top: 10px; display: none;">
-                <label style="display: block; margin-bottom: 3px; font-size: 11px; font-weight: 600;">Profondeur des relations :</label>
+                <label style="display: block; margin-bottom: 3px; font-size: 11px; font-weight: 600;">Profondeur :</label>
                 <select id="relationDepth">
                     <option value="1">Niveau 1 (directes)</option>
-                    <option value="2">Niveau 2 (amis d'amis)</option>
+                    <option value="2">Niveau 2</option>
                     <option value="3">Niveau 3</option>
                     <option value="all">Tous les niveaux</option>
                 </select>
             </div>
         </div>
-        
-        <!-- Filtres de base -->
+
         <label>
             <input type="checkbox" id="showInactive">
             Afficher entités inactives
         </label>
-        
+
         <div style="margin-top: 10px;">
             <label style="display: block; margin-bottom: 3px; font-size: 11px; font-weight: 600;">Type de relation :</label>
             <select id="filterRelation">
                 <option value="all">Toutes</option>
             </select>
         </div>
-        
+
         <div style="margin-top: 10px;">
             <label style="display: block; margin-bottom: 3px; font-size: 11px; font-weight: 600;">Type d'entité :</label>
             <select id="filterEntity">
                 <option value="all">Toutes</option>
             </select>
         </div>
-        
-        <!-- Section Layout Phase 1 -->
+
+        <!-- Layout Phase 1 -->
         <div class="control-section">
             <div class="control-section-title">⚡ Layout par intensité <span class="badge new">Phase 1</span></div>
-            
             <label>
                 <input type="checkbox" id="enableIntensityLayout" checked onchange="refreshGraph()">
-                Activer positionnement pondéré
+                Positionnement pondéré
             </label>
-            
             <label>
                 <input type="checkbox" id="showCentralitySize" checked onchange="refreshGraph()">
                 Taille selon centralité
             </label>
-            
             <div style="margin-top: 10px;">
-                <label style="display: block; margin-bottom: 3px; font-size: 11px;">Force des liens forts :</label>
-                <input type="range" id="strongLinkForce" min="50" max="150" value="80" 
+                <label style="display: block; margin-bottom: 3px; font-size: 11px;">Liens forts :</label>
+                <input type="range" id="strongLinkForce" min="50" max="150" value="80"
                        style="width: 100%;" onchange="updateForceLabel(); refreshGraph()">
                 <div style="font-size: 10px; color: #999; text-align: center;" id="strongLinkLabel">80px</div>
             </div>
-            
             <div style="margin-top: 10px;">
-                <label style="display: block; margin-bottom: 3px; font-size: 11px;">Force des liens faibles :</label>
-                <input type="range" id="weakLinkForce" min="150" max="400" value="250" 
+                <label style="display: block; margin-bottom: 3px; font-size: 11px;">Liens faibles :</label>
+                <input type="range" id="weakLinkForce" min="150" max="400" value="250"
                        style="width: 100%;" onchange="updateForceLabel(); refreshGraph()">
                 <div style="font-size: 10px; color: #999; text-align: center;" id="weakLinkLabel">250px</div>
             </div>
         </div>
-        
-        <!-- Boutons -->
+
         <button onclick="network && network.fit()">🎯 Recentrer</button>
         <button onclick="resetPhysics()">🔄 Réinitialiser layout</button>
         <button onclick="resetFilters()" class="reset-btn">↺ Réinitialiser filtres</button>
@@ -472,38 +443,35 @@
 
     <div id="mynetwork"></div>
 
+    <!-- Panneau info -->
     <div id="info-panel">
         <h3>📊 Informations</h3>
-        
-        <div class="info-section" id="metrics-section">
-            <h4>Métriques du réseau <span class="badge new">Phase 1</span></h4>
+        <div class="info-section">
+            <h4>Métriques <span class="badge new">Phase 1</span></h4>
             <div id="metricsContent">
                 <div class="stats-row"><span>Densité :</span><strong>—</strong></div>
                 <div class="stats-row"><span>Degré moyen :</span><strong>—</strong></div>
                 <div class="stats-row"><span>Liens forts :</span><strong>—</strong></div>
             </div>
         </div>
-        
-        <div class="info-section" id="stats-section">
+        <div class="info-section">
             <h4>Statistiques</h4>
             <div id="statsContent">
-                <div class="stats-row"><span>Entités affichées :</span><strong>—</strong></div>
-                <div class="stats-row"><span>Relations affichées :</span><strong>—</strong></div>
+                <div class="stats-row"><span>Entités :</span><strong>—</strong></div>
+                <div class="stats-row"><span>Relations :</span><strong>—</strong></div>
             </div>
         </div>
-
-        <div class="info-section" id="entities-section">
+        <div class="info-section">
             <h4>Types d'entités</h4>
             <div id="entitiesLegend">Chargement...</div>
         </div>
-
-        <div class="info-section" id="relations-section">
+        <div class="info-section">
             <h4>Types de relations</h4>
             <div id="relationsLegend">Chargement...</div>
         </div>
     </div>
 
-    <!-- TOOLTIP PERSONNALISÉ -->
+    <!-- Tooltip personnalisé -->
     <div id="custom-tooltip"></div>
 
     <div id="debug"></div>
@@ -519,22 +487,22 @@
                 TYPES_RELATIONS: 'TYPES_RELATIONS'
             },
             COLONNES: {
-                ENTITE_NOM:      'Nom',
-                ENTITE_SIGLE:    'Sigle',
-                ENTITE_TYPE:     'Type_',
-                ENTITE_DESC:     'Description',
-                ENTITE_RESP:     'Responsable',
-                ENTITE_ACTIF:    'Actif',
-                REL_SOURCE:      'Source_',
-                REL_CIBLE:       'Cible_',
-                REL_TYPE:        'Type_',
-                REL_INTENSITE:   'Intensite',
-                REL_BIDIRECT:    'Bidirectionnel',
-                REL_COMMENT:     'Commentaire',
-                REL_VALIDE:      'Valide',
-                TYPE_NOM:        'Nom_',
-                TYPE_COULEUR:    'Couleur_',
-                TYPE_EPAISSEUR:  'Epaisseur_'
+                ENTITE_NOM:     'Nom',
+                ENTITE_SIGLE:   'Sigle',
+                ENTITE_TYPE:    'Type_',
+                ENTITE_DESC:    'Description',
+                ENTITE_RESP:    'Responsable',
+                ENTITE_ACTIF:   'Actif',
+                REL_SOURCE:     'Source_',
+                REL_CIBLE:      'Cible_',
+                REL_TYPE:       'Type_',
+                REL_INTENSITE:  'Intensite',
+                REL_BIDIRECT:   'Bidirectionnel',
+                REL_COMMENT:    'Commentaire',
+                REL_VALIDE:     'Valide',
+                TYPE_NOM:       'Nom_',
+                TYPE_COULEUR:   'Couleur_',
+                TYPE_EPAISSEUR: 'Epaisseur_'
             }
         };
 
@@ -562,164 +530,158 @@
             'S': 'Service', 'P': 'Pôle', 'C': 'Cellule', 'U': 'Unité'
         };
 
-        function getTypeColor(type) {
-            return typeColors[type] || '#95A5A6';
-        }
-
-        function getTypeLabel(type) {
-            return typeLabels[type] || type;
-        }
+        function getTypeColor(type) { return typeColors[type] || '#95A5A6'; }
+        function getTypeLabel(type) { return typeLabels[type] || type; }
 
         // ═══════════════════════════════════════════════════════════════════════
         // TOOLTIP PERSONNALISÉ
         // ═══════════════════════════════════════════════════════════════════════
-        const tooltip = document.getElementById('custom-tooltip');
+        const tooltipEl = document.getElementById('custom-tooltip');
+        let tooltipVisible = false;
 
         function showTooltip(x, y, html) {
-            tooltip.innerHTML = html;
-            tooltip.style.display = 'block';
-            
-            // Ajustement position pour ne pas dépasser l'écran
-            const tw = tooltip.offsetWidth;
-            const th = tooltip.offsetHeight;
-            const ww = window.innerWidth;
-            const wh = window.innerHeight;
-            
-            let left = x + 15;
-            let top = y + 15;
-            
-            if (left + tw > ww - 20) left = x - tw - 15;
-            if (top + th > wh - 20) top = y - th - 15;
-            
-            tooltip.style.left = left + 'px';
-            tooltip.style.top = top + 'px';
+            tooltipEl.innerHTML = html;
+            tooltipEl.style.display = 'block';
+            tooltipVisible = true;
+            positionTooltip(x, y);
         }
 
         function hideTooltip() {
-            tooltip.style.display = 'none';
+            tooltipEl.style.display = 'none';
+            tooltipVisible = false;
         }
 
-        function buildNodeTooltip(entity, centrality) {
-            const color = getTypeColor(entity.Type);
-            const typeLabel = getTypeLabel(entity.Type);
-            const centralityPct = centrality ? Math.round(centrality.normalized * 100) : 0;
-            const degree = centrality ? centrality.degree : 0;
-            const weighted = centrality ? centrality.weighted : 0;
+        function positionTooltip(x, y) {
+            const tw = tooltipEl.offsetWidth  || 280;
+            const th = tooltipEl.offsetHeight || 150;
+            const ww = window.innerWidth;
+            const wh = window.innerHeight;
+            let left = x + 16;
+            let top  = y + 16;
+            if (left + tw > ww - 10) left = x - tw - 16;
+            if (top  + th > wh - 10) top  = y - th - 16;
+            tooltipEl.style.left = left + 'px';
+            tooltipEl.style.top  = top  + 'px';
+        }
 
-            let html = `
-                <div class="tooltip-header" style="background: ${color};">
-                    <div class="tooltip-name">${entity.Nom}</div>
-                    ${entity.Sigle ? `<div class="tooltip-sigle">Sigle : ${entity.Sigle}</div>` : ''}
+        // Déplacer le tooltip avec la souris
+        document.getElementById('mynetwork').addEventListener('mousemove', function(e) {
+            if (tooltipVisible) positionTooltip(e.clientX, e.clientY);
+        });
+
+        // ─── Contenu tooltip NŒUD ───────────────────────────────────────────
+        function buildNodeTooltip(entity) {
+            const color    = getTypeColor(entity.Type);
+            const label    = getTypeLabel(entity.Type);
+            const c        = centralityScores[entity.id] || {};
+            const pct      = ((c.normalized || 0) * 100).toFixed(0);
+            const degree   = c.degree   || 0;
+            const weighted = c.weighted || 0;
+
+            let html = `<div class="tooltip-node">
+                <div class="tooltip-header" style="background:${color};">
+                    <div class="tooltip-nom">${entity.Nom}</div>
+                    ${entity.Sigle ? `<div class="tooltip-sigle">${entity.Sigle}</div>` : ''}
                 </div>
                 <div class="tooltip-body">
                     <div class="tooltip-row">
-                        <span class="tooltip-label">Type</span>
-                        <span class="tooltip-value">
-                            <span class="tooltip-type-badge" style="background: ${color};">
-                                ${typeLabel}
-                            </span>
-                        </span>
+                        <span class="t-label">Type</span>
+                        <span class="t-value">${label}</span>
                     </div>`;
 
             if (entity.Responsable) {
-                html += `
-                    <div class="tooltip-row">
-                        <span class="tooltip-label">Responsable</span>
-                        <span class="tooltip-value">${entity.Responsable}</span>
-                    </div>`;
+                html += `<div class="tooltip-row">
+                    <span class="t-label">Responsable</span>
+                    <span class="t-value">${entity.Responsable}</span>
+                </div>`;
             }
 
-            html += `
-                    <div class="tooltip-divider"></div>
-                    <div class="tooltip-metrics">
-                        <div class="tooltip-metric-box">
-                            <span class="metric-value">${centralityPct}%</span>
-                            <span class="metric-label">Centralité</span>
-                        </div>
-                        <div class="tooltip-metric-box">
-                            <span class="metric-value">${degree}</span>
-                            <span class="metric-label">Degré</span>
-                        </div>
-                        <div class="tooltip-metric-box">
-                            <span class="metric-value">${weighted}</span>
-                            <span class="metric-label">Score</span>
-                        </div>
-                    </div>`;
+            html += `<div class="tooltip-metrics">
+                    <div class="tooltip-metric">
+                        <span class="m-value">${pct}%</span>
+                        <span class="m-label">Centralité</span>
+                    </div>
+                    <div class="tooltip-metric">
+                        <span class="m-value">${degree}</span>
+                        <span class="m-label">Degré</span>
+                    </div>
+                    <div class="tooltip-metric">
+                        <span class="m-value">${weighted}</span>
+                        <span class="m-label">Score</span>
+                    </div>
+                </div>`;
 
             if (entity.Description) {
-                html += `
-                    <div class="tooltip-description">${entity.Description}</div>`;
+                html += `<div class="tooltip-desc">${entity.Description}</div>`;
             }
 
-            html += `</div>`;
+            html += `</div></div>`;
             return html;
         }
 
-        function buildEdgeTooltip(relation, relType, sourceEntity, targetEntity) {
-            const color = relType?.Couleur || '#34495e';
+        // ─── Contenu tooltip LIEN ────────────────────────────────────────────
+        function buildEdgeTooltip(relation) {
+            const relType  = relationTypes.find(t => t.id === relation.Type) || {};
+            const color    = relType.Couleur || '#34495e';
+            const src      = allEntities.find(e => e.id === relation.Source);
+            const tgt      = allEntities.find(e => e.id === relation.Cible);
             const intensite = relation.Intensité || 'Moyenne';
-            const intensiteClass = intensite === 'Forte' ? 'intensite-forte' :
-                                  intensite === 'Faible' ? 'intensite-faible' :
-                                  'intensite-moyenne';
+            const iClass   = intensite === 'Forte'  ? 'intensite-forte'  :
+                             intensite === 'Faible' ? 'intensite-faible' :
+                                                      'intensite-moyenne';
 
-            let html = `
-                <div class="tooltip-edge-header" style="background: ${color};">
-                    <div class="tooltip-edge-type">${relType?.Nom || 'Relation'}</div>
-                    <div class="tooltip-arrow">
-                        <span class="arrow-entity">${sourceEntity?.Sigle || sourceEntity?.Nom || '?'}</span>
-                        <span class="arrow-sym">${relation.Bidirectionnel ? '⟷' : '→'}</span>
-                        <span class="arrow-entity">${targetEntity?.Sigle || targetEntity?.Nom || '?'}</span>
+            let html = `<div class="tooltip-edge">
+                <div class="tooltip-edge-header" style="background:${color};">
+                    <div class="edge-type">${relType.Nom || 'Relation'}</div>
+                    <div class="edge-arrow">
+                        <span class="edge-entity">${src?.Sigle || src?.Nom || '?'}</span>
+                        <span>${relation.Bidirectionnel ? '⟷' : '→'}</span>
+                        <span class="edge-entity">${tgt?.Sigle || tgt?.Nom || '?'}</span>
                     </div>
                 </div>
                 <div class="tooltip-body">
                     <div class="tooltip-row">
-                        <span class="tooltip-label">Source</span>
-                        <span class="tooltip-value">${sourceEntity?.Nom || '?'}</span>
+                        <span class="t-label">Source</span>
+                        <span class="t-value">${src?.Nom || '?'}</span>
                     </div>
                     <div class="tooltip-row">
-                        <span class="tooltip-label">Cible</span>
-                        <span class="tooltip-value">${targetEntity?.Nom || '?'}</span>
+                        <span class="t-label">Cible</span>
+                        <span class="t-value">${tgt?.Nom || '?'}</span>
                     </div>
-                    <div class="tooltip-divider"></div>
                     <div class="tooltip-row">
-                        <span class="tooltip-label">Intensité</span>
-                        <span class="tooltip-value">
-                            <span class="tooltip-intensite ${intensiteClass}">${intensite}</span>
+                        <span class="t-label">Intensité</span>
+                        <span class="t-value">
+                            <span class="tooltip-intensite ${iClass}">${intensite}</span>
                         </span>
                     </div>
                     ${relation.Bidirectionnel ? `
                     <div class="tooltip-row">
-                        <span class="tooltip-label">Direction</span>
-                        <span class="tooltip-value">⟷ Bidirectionnel</span>
+                        <span class="t-label">Direction</span>
+                        <span class="t-value">⟷ Bidirectionnel</span>
                     </div>` : ''}
                     ${relation.Commentaire ? `
-                    <div class="tooltip-divider"></div>
-                    <div class="tooltip-description">${relation.Commentaire}</div>` : ''}
-                </div>`;
-
+                    <div class="tooltip-desc">${relation.Commentaire}</div>` : ''}
+                </div>
+            </div>`;
             return html;
         }
 
         // ═══════════════════════════════════════════════════════════════════════
-        // Calcul des entités connectées
+        // Entités connectées (filtre par niveau)
         // ═══════════════════════════════════════════════════════════════════════
         function getConnectedEntities(entityId, relations, maxDepth) {
             if (!entityId || maxDepth === 'all') return null;
-            
-            const connected = new Set([parseInt(entityId)]);
-            let currentLevel = new Set([parseInt(entityId)]);
-            
-            for (let depth = 0; depth < parseInt(maxDepth); depth++) {
+            const connected   = new Set([parseInt(entityId)]);
+            let currentLevel  = new Set([parseInt(entityId)]);
+            for (let d = 0; d < parseInt(maxDepth); d++) {
                 const nextLevel = new Set();
                 currentLevel.forEach(nodeId => {
                     relations.forEach(rel => {
                         if (rel.Source === nodeId && !connected.has(rel.Cible)) {
-                            nextLevel.add(rel.Cible);
-                            connected.add(rel.Cible);
+                            nextLevel.add(rel.Cible); connected.add(rel.Cible);
                         }
                         if (rel.Cible === nodeId && !connected.has(rel.Source)) {
-                            nextLevel.add(rel.Source);
-                            connected.add(rel.Source);
+                            nextLevel.add(rel.Source); connected.add(rel.Source);
                         }
                     });
                 });
@@ -730,86 +692,69 @@
         }
 
         // ═══════════════════════════════════════════════════════════════════════
-        // Calcul de centralité
+        // Centralité
         // ═══════════════════════════════════════════════════════════════════════
         function calculateCentrality(entities, relations) {
-            const centrality = {};
+            const c = {};
             entities.forEach(e => {
-                const outgoing = relations.filter(r => r.Source === e.id);
-                const incoming = relations.filter(r => r.Cible === e.id);
-                const weightedScore = [...outgoing, ...incoming].reduce((sum, r) => {
-                    const weight = r.Intensité === 'Forte' ? 3 : r.Intensité === 'Moyenne' ? 2 : 1;
-                    return sum + weight;
+                const out = relations.filter(r => r.Source === e.id);
+                const inc = relations.filter(r => r.Cible  === e.id);
+                const score = [...out, ...inc].reduce((s, r) => {
+                    return s + (r.Intensité === 'Forte' ? 3 : r.Intensité === 'Moyenne' ? 2 : 1);
                 }, 0);
-                centrality[e.id] = {
-                    score: weightedScore,
-                    degree: outgoing.length + incoming.length,
-                    weighted: weightedScore
-                };
+                c[e.id] = { score, degree: out.length + inc.length, weighted: score };
             });
-            const maxScore = Math.max(...Object.values(centrality).map(c => c.score), 1);
-            Object.keys(centrality).forEach(id => {
-                centrality[id].normalized = centrality[id].score / maxScore;
-            });
-            return centrality;
+            const maxS = Math.max(...Object.values(c).map(x => x.score), 1);
+            Object.keys(c).forEach(id => { c[id].normalized = c[id].score / maxS; });
+            return c;
         }
 
         // ═══════════════════════════════════════════════════════════════════════
-        // Métriques du réseau
+        // Métriques réseau
         // ═══════════════════════════════════════════════════════════════════════
         function calculateNetworkMetrics(entities, relations) {
             const n = entities.length;
             const m = relations.length;
-            const maxLinks = n * (n - 1);
-            const density = maxLinks > 0 ? m / maxLinks : 0;
+            const density   = n > 1 ? m / (n * (n - 1)) : 0;
             const avgDegree = n > 0 ? (m * 2) / n : 0;
-            const strongLinks = relations.filter(r => r.Intensité === 'Forte').length;
-            const mediumLinks = relations.filter(r => r.Intensité === 'Moyenne').length;
-            const weakLinks = relations.filter(r => r.Intensité === 'Faible').length;
-
-            let maxConnected = null;
-            let maxConnections = 0;
-            if (Object.keys(centralityScores).length > 0) {
-                Object.entries(centralityScores).forEach(([id, data]) => {
-                    if (data.degree > maxConnections) {
-                        maxConnections = data.degree;
-                        maxConnected = entities.find(e => e.id === parseInt(id));
-                    }
-                });
-            }
-            return { density, avgDegree, strongLinks, mediumLinks, weakLinks, maxConnected, maxConnections };
+            const strong    = relations.filter(r => r.Intensité === 'Forte').length;
+            const medium    = relations.filter(r => r.Intensité === 'Moyenne').length;
+            const weak      = relations.filter(r => r.Intensité === 'Faible').length;
+            let maxNode = null, maxDeg = 0;
+            Object.entries(centralityScores).forEach(([id, data]) => {
+                if (data.degree > maxDeg) {
+                    maxDeg  = data.degree;
+                    maxNode = entities.find(e => e.id === parseInt(id));
+                }
+            });
+            return { density, avgDegree, strong, medium, weak, maxNode, maxDeg };
         }
 
         // ═══════════════════════════════════════════════════════════════════════
         // Debug
         // ═══════════════════════════════════════════════════════════════════════
         const dbg = document.getElementById('debug');
-        
         function log(type, ...args) {
             console.log(...args);
             const line = args.map(a => typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a)).join(' ');
-            const className = `debug-${type}`;
-            dbg.innerHTML += `<div class="${className}">${line}</div>`;
+            const cls  = type === 'error' ? 'debug-error' : type === 'success' ? 'debug-success' :
+                         type === 'warning' ? 'debug-warning' : 'debug-info';
+            dbg.innerHTML += `<div class="${cls}">${line}</div>`;
             dbg.scrollTop = dbg.scrollHeight;
         }
-        
-        function toggleDebug() { 
-            dbg.style.display = dbg.style.display === 'none' || dbg.style.display === '' ? 'block' : 'none';
+        function toggleDebug() {
+            dbg.style.display = (dbg.style.display === 'none' || !dbg.style.display) ? 'block' : 'none';
         }
-        
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape' && dbg.style.display === 'block') {
-                toggleDebug();
-            }
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && dbg.style.display === 'block') toggleDebug();
         });
-
         function updateForceLabel() {
             document.getElementById('strongLinkLabel').textContent = document.getElementById('strongLinkForce').value + 'px';
-            document.getElementById('weakLinkLabel').textContent = document.getElementById('weakLinkForce').value + 'px';
+            document.getElementById('weakLinkLabel').textContent   = document.getElementById('weakLinkForce').value   + 'px';
         }
 
         // ═══════════════════════════════════════════════════════════════════════
-        // Helper
+        // Helper colonne
         // ═══════════════════════════════════════════════════════════════════════
         function getColumn(data, colName, idx) {
             const value = data[colName]?.[idx] ?? data[colName + '_']?.[idx];
@@ -818,12 +763,9 @@
         }
 
         // ═══════════════════════════════════════════════════════════════════════
-        // Grist Setup
+        // Grist
         // ═══════════════════════════════════════════════════════════════════════
-        grist.ready({
-            requiredAccess: 'read table',
-            allowSelectBy: true
-        });
+        grist.ready({ requiredAccess: 'read table', allowSelectBy: true });
 
         // ═══════════════════════════════════════════════════════════════════════
         // Chargement
@@ -831,114 +773,102 @@
         async function loadAllData() {
             try {
                 log('info', '🔄 Chargement...');
-
                 const [entitiesData, relationsData, typesData] = await Promise.all([
                     grist.docApi.fetchTable(CONFIG.TABLES.ENTITES),
                     grist.docApi.fetchTable(CONFIG.TABLES.RELATIONS),
                     grist.docApi.fetchTable(CONFIG.TABLES.TYPES_RELATIONS)
                 ]);
+                if (!entitiesData.id?.length) throw new Error(`Table ${CONFIG.TABLES.ENTITES} vide`);
 
-                if (!entitiesData.id || entitiesData.id.length === 0) {
-                    throw new Error(`Table ${CONFIG.TABLES.ENTITES} est vide`);
-                }
-
-                allEntities = entitiesData.id.map((id, idx) => ({
+                allEntities = entitiesData.id.map((id, i) => ({
                     id,
-                    Nom: getColumn(entitiesData, CONFIG.COLONNES.ENTITE_NOM, idx) || '',
-                    Sigle: getColumn(entitiesData, CONFIG.COLONNES.ENTITE_SIGLE, idx) || '',
-                    Type: getColumn(entitiesData, CONFIG.COLONNES.ENTITE_TYPE, idx) || '',
-                    Description: getColumn(entitiesData, CONFIG.COLONNES.ENTITE_DESC, idx) || '',
-                    Responsable: getColumn(entitiesData, CONFIG.COLONNES.ENTITE_RESP, idx) || '',
-                    Actif: getColumn(entitiesData, CONFIG.COLONNES.ENTITE_ACTIF, idx) !== false
+                    Nom:         getColumn(entitiesData, CONFIG.COLONNES.ENTITE_NOM,   i) || '',
+                    Sigle:       getColumn(entitiesData, CONFIG.COLONNES.ENTITE_SIGLE, i) || '',
+                    Type:        getColumn(entitiesData, CONFIG.COLONNES.ENTITE_TYPE,  i) || '',
+                    Description: getColumn(entitiesData, CONFIG.COLONNES.ENTITE_DESC,  i) || '',
+                    Responsable: getColumn(entitiesData, CONFIG.COLONNES.ENTITE_RESP,  i) || '',
+                    Actif:       getColumn(entitiesData, CONFIG.COLONNES.ENTITE_ACTIF, i) !== false
                 }));
 
-                allRelations = (relationsData.id || []).map((id, idx) => ({
+                allRelations = (relationsData.id || []).map((id, i) => ({
                     id,
-                    Source: getColumn(relationsData, CONFIG.COLONNES.REL_SOURCE, idx),
-                    Cible: getColumn(relationsData, CONFIG.COLONNES.REL_CIBLE, idx),
-                    Type: getColumn(relationsData, CONFIG.COLONNES.REL_TYPE, idx),
-                    Intensité: getColumn(relationsData, CONFIG.COLONNES.REL_INTENSITE, idx) || 'Moyenne',
-                    Bidirectionnel: getColumn(relationsData, CONFIG.COLONNES.REL_BIDIRECT, idx) || false,
-                    Commentaire: getColumn(relationsData, CONFIG.COLONNES.REL_COMMENT, idx) || '',
-                    Validé: getColumn(relationsData, CONFIG.COLONNES.REL_VALIDE, idx) !== false
+                    Source:         getColumn(relationsData, CONFIG.COLONNES.REL_SOURCE,   i),
+                    Cible:          getColumn(relationsData, CONFIG.COLONNES.REL_CIBLE,    i),
+                    Type:           getColumn(relationsData, CONFIG.COLONNES.REL_TYPE,     i),
+                    Intensité:      getColumn(relationsData, CONFIG.COLONNES.REL_INTENSITE,i) || 'Moyenne',
+                    Bidirectionnel: getColumn(relationsData, CONFIG.COLONNES.REL_BIDIRECT, i) || false,
+                    Commentaire:    getColumn(relationsData, CONFIG.COLONNES.REL_COMMENT,  i) || '',
+                    Validé:         getColumn(relationsData, CONFIG.COLONNES.REL_VALIDE,   i) !== false
                 }));
 
-                relationTypes = (typesData.id || []).map((id, idx) => ({
+                relationTypes = (typesData.id || []).map((id, i) => ({
                     id,
-                    Nom: getColumn(typesData, CONFIG.COLONNES.TYPE_NOM, idx) || '',
-                    Couleur: getColumn(typesData, CONFIG.COLONNES.TYPE_COULEUR, idx) || '#95A5A6',
-                    Épaisseur: getColumn(typesData, CONFIG.COLONNES.TYPE_EPAISSEUR, idx) || 1
+                    Nom:       getColumn(typesData, CONFIG.COLONNES.TYPE_NOM,       i) || '',
+                    Couleur:   getColumn(typesData, CONFIG.COLONNES.TYPE_COULEUR,   i) || '#95A5A6',
+                    Épaisseur: getColumn(typesData, CONFIG.COLONNES.TYPE_EPAISSEUR, i) || 1
                 }));
 
                 log('success', `✅ ${allEntities.length} entités, ${allRelations.length} relations, ${relationTypes.length} types`);
-
                 entityTypes = new Set(allEntities.map(e => e.Type).filter(Boolean));
-                
                 dataLoaded = true;
                 populateFilters();
                 refreshGraph();
                 document.getElementById('loading').classList.add('hidden');
 
-            } catch (error) {
-                console.error('❌ Erreur:', error);
-                log('error', `❌ ${error.message}`);
+            } catch (err) {
+                log('error', `❌ ${err.message}`);
                 document.getElementById('loading').innerHTML = `
-                    <div style="color: #e74c3c; max-width: 500px; padding: 20px;">
-                        <strong>⚠️ Erreur de chargement</strong><br><br>${error.message}
+                    <div style="color:#e74c3c;padding:20px;">
+                        <strong>⚠️ Erreur</strong><br><br>${err.message}
                     </div>`;
                 dbg.style.display = 'block';
             }
         }
 
         // ═══════════════════════════════════════════════════════════════════════
-        // Réinitialisation des filtres
+        // Réinitialisation
         // ═══════════════════════════════════════════════════════════════════════
         function resetFilters() {
             document.getElementById('filterSpecificEntity').value = 'all';
-            document.getElementById('filterRelation').value = 'all';
-            document.getElementById('filterEntity').value = 'all';
-            document.getElementById('showInactive').checked = false;
+            document.getElementById('filterRelation').value       = 'all';
+            document.getElementById('filterEntity').value         = 'all';
+            document.getElementById('showInactive').checked       = false;
             document.getElementById('depthControl').style.display = 'none';
             refreshGraph();
-            log('info', '↺ Filtres réinitialisés');
         }
 
         // ═══════════════════════════════════════════════════════════════════════
         // Filtres
         // ═══════════════════════════════════════════════════════════════════════
         function populateFilters() {
-            // Filtre entité spécifique - TRI PAR SIGLE
-            const specificEntitySelect = document.getElementById('filterSpecificEntity');
-            specificEntitySelect.innerHTML = '<option value="all">Vue complète</option>';
-            
-            const sortedEntities = [...allEntities].sort((a, b) => {
-                const siglaA = (a.Sigle || a.Nom || '').toLowerCase();
-                const siglaB = (b.Sigle || b.Nom || '').toLowerCase();
-                return siglaA.localeCompare(siglaB, 'fr');
-            });
-            
-            sortedEntities.forEach(entity => {
-                const opt = document.createElement('option');
-                opt.value = entity.id;
-                opt.textContent = entity.Sigle ? `${entity.Sigle} — ${entity.Nom}` : entity.Nom;
-                specificEntitySelect.appendChild(opt);
-            });
+            // ─── Entité spécifique (tri par sigle) ─────────────────────────────
+            const specificSel = document.getElementById('filterSpecificEntity');
+            specificSel.innerHTML = '<option value="all">Vue complète</option>';
 
-            // Filtre types de relations
-            const relationSelect = document.getElementById('filterRelation');
-            relationSelect.innerHTML = '<option value="all">Toutes</option>';
-            relationTypes.forEach(type => {
-                if (type.Nom) {
+            [...allEntities]
+                .sort((a, b) => (a.Sigle || a.Nom || '').localeCompare(b.Sigle || b.Nom || '', 'fr'))
+                .forEach(entity => {
                     const opt = document.createElement('option');
-                    opt.value = type.id;
-                    opt.textContent = type.Nom;
-                    relationSelect.appendChild(opt);
+                    opt.value = entity.id;
+                    opt.textContent = entity.Sigle ? `${entity.Sigle} — ${entity.Nom}` : entity.Nom;
+                    specificSel.appendChild(opt);
+                });
+
+            // ─── Types de relations ─────────────────────────────────────────────
+            const relSel = document.getElementById('filterRelation');
+            relSel.innerHTML = '<option value="all">Toutes</option>';
+            relationTypes.forEach(t => {
+                if (t.Nom) {
+                    const opt = document.createElement('option');
+                    opt.value = t.id;
+                    opt.textContent = t.Nom;
+                    relSel.appendChild(opt);
                 }
             });
 
-            // Filtre types d'entités - TRI ALPHABÉTIQUE
-            const entitySelect = document.getElementById('filterEntity');
-            entitySelect.innerHTML = '<option value="all">Toutes</option>';
+            // ─── Types d'entités (tri alphabétique par label) ───────────────────
+            const entSel = document.getElementById('filterEntity');
+            entSel.innerHTML = '<option value="all">Toutes</option>';
             [...entityTypes]
                 .sort((a, b) => getTypeLabel(a).localeCompare(getTypeLabel(b), 'fr'))
                 .forEach(type => {
@@ -946,37 +876,33 @@
                     const opt = document.createElement('option');
                     opt.value = type;
                     opt.textContent = `${getTypeLabel(type)} (${count})`;
-                    entitySelect.appendChild(opt);
+                    entSel.appendChild(opt);
                 });
 
-            // Événements - attachés UNE SEULE FOIS via data-initialized
-            if (!specificEntitySelect.dataset.initialized) {
-                specificEntitySelect.addEventListener('change', function() {
-                    document.getElementById('depthControl').style.display = 
+            // ─── Événements (une seule fois via data-init) ──────────────────────
+            if (!specificSel.dataset.init) {
+                specificSel.addEventListener('change', function () {
+                    document.getElementById('depthControl').style.display =
                         this.value !== 'all' ? 'block' : 'none';
                     refreshGraph();
                 });
-                specificEntitySelect.dataset.initialized = 'true';
+                specificSel.dataset.init = '1';
             }
-
-            if (!document.getElementById('relationDepth').dataset.initialized) {
+            if (!document.getElementById('relationDepth').dataset.init) {
                 document.getElementById('relationDepth').addEventListener('change', refreshGraph);
-                document.getElementById('relationDepth').dataset.initialized = 'true';
+                document.getElementById('relationDepth').dataset.init = '1';
             }
-
-            if (!relationSelect.dataset.initialized) {
-                relationSelect.addEventListener('change', refreshGraph);
-                relationSelect.dataset.initialized = 'true';
+            if (!relSel.dataset.init) {
+                relSel.addEventListener('change', refreshGraph);
+                relSel.dataset.init = '1';
             }
-
-            if (!entitySelect.dataset.initialized) {
-                entitySelect.addEventListener('change', refreshGraph);
-                entitySelect.dataset.initialized = 'true';
+            if (!entSel.dataset.init) {
+                entSel.addEventListener('change', refreshGraph);
+                entSel.dataset.init = '1';
             }
-
-            if (!document.getElementById('showInactive').dataset.initialized) {
+            if (!document.getElementById('showInactive').dataset.init) {
                 document.getElementById('showInactive').addEventListener('change', refreshGraph);
-                document.getElementById('showInactive').dataset.initialized = 'true';
+                document.getElementById('showInactive').dataset.init = '1';
             }
 
             log('success', '✅ Filtres initialisés');
@@ -986,30 +912,27 @@
         // Rendu du graphe
         // ═══════════════════════════════════════════════════════════════════════
         function refreshGraph() {
-            if (!dataLoaded || allEntities.length === 0) {
-                log('info', '⏸️ Pas de données');
-                return;
-            }
+            if (!dataLoaded || allEntities.length === 0) return;
 
-            const showInactive = document.getElementById('showInactive').checked;
-            const filterRel = document.getElementById('filterRelation').value;
-            const filterEnt = document.getElementById('filterEntity').value;
-            const enableIntensity = document.getElementById('enableIntensityLayout').checked;
-            const showCentrality = document.getElementById('showCentralitySize').checked;
-            const strongForce = parseInt(document.getElementById('strongLinkForce').value);
-            const weakForce = parseInt(document.getElementById('weakLinkForce').value);
-            const specificEntity = document.getElementById('filterSpecificEntity').value;
-            const depth = document.getElementById('relationDepth').value;
+            const showInactive     = document.getElementById('showInactive').checked;
+            const filterRel        = document.getElementById('filterRelation').value;
+            const filterEnt        = document.getElementById('filterEntity').value;
+            const enableIntensity  = document.getElementById('enableIntensityLayout').checked;
+            const showCentrality   = document.getElementById('showCentralitySize').checked;
+            const strongForce      = parseInt(document.getElementById('strongLinkForce').value);
+            const weakForce        = parseInt(document.getElementById('weakLinkForce').value);
+            const specificEntity   = document.getElementById('filterSpecificEntity').value;
+            const depth            = document.getElementById('relationDepth').value;
 
-            let connectedEntityIds = null;
+            let connectedIds = null;
             if (specificEntity !== 'all') {
-                connectedEntityIds = getConnectedEntities(specificEntity, allRelations, depth);
+                connectedIds = getConnectedEntities(specificEntity, allRelations, depth);
             }
 
             const filteredEntities = allEntities.filter(e => {
                 if (!showInactive && !e.Actif) return false;
                 if (filterEnt !== 'all' && e.Type !== filterEnt) return false;
-                if (connectedEntityIds && !connectedEntityIds.has(e.id)) return false;
+                if (connectedIds && !connectedIds.has(e.id)) return false;
                 return true;
             });
 
@@ -1021,87 +944,63 @@
                 return entityIds.has(r.Source) && entityIds.has(r.Cible);
             });
 
-            log('info', `📊 ${filteredEntities.length} entités, ${filteredRelations.length} relations`);
-
             centralityScores = calculateCentrality(filteredEntities, filteredRelations);
 
-            const selectedEntityId = parseInt(specificEntity);
-
-            // ── NŒUDS ──────────────────────────────────────────────────────────
+            // ─── Nœuds ─────────────────────────────────────────────────────────
             const nodes = filteredEntities.map(e => {
-                const color = getTypeColor(e.Type);
-                const label = e.Sigle || e.Nom;
+                const color      = getTypeColor(e.Type);
                 const centrality = centralityScores[e.id]?.normalized || 0;
-                const baseSize = 20;
-                const nodeSize = showCentrality ? baseSize + (centrality * 30) : baseSize;
-                const isSelected = e.id === selectedEntityId;
+                const nodeSize   = showCentrality ? 20 + centrality * 30 : 20;
 
                 return {
-                    id: e.id,
-                    label: label,
-                    // title = null car on gère le tooltip manuellement
-                    title: undefined,
-                    color: e.Actif ? color : '#CCCCCC',
-                    shape: e.Type === 'D' || e.Type === 'Direction' ? 'box' : 'ellipse',
-                    size: isSelected ? nodeSize + 10 : nodeSize,
-                    value: centrality * 100,
+                    id:          e.id,
+                    label:       e.Sigle || e.Nom,
+                    // title vide : on gère le tooltip manuellement
+                    title:       '',
+                    color:       e.Actif ? color : '#CCCCCC',
+                    shape:       e.Type === 'D' || e.Type === 'Direction' ? 'box' : 'ellipse',
+                    size:        nodeSize,
+                    value:       centrality * 100,
                     font: {
-                        size: isSelected ? Math.max(16, 12 + centrality * 6) : Math.max(12, 12 + centrality * 6),
-                        bold: isSelected || (e.Type === 'D' || e.Type === 'Direction') || centrality > 0.7,
+                        size:  Math.max(12, 12 + centrality * 6),
+                        bold:  (e.Type === 'D' || e.Type === 'Direction') || centrality > 0.7,
                         color: e.Actif ? '#000000' : '#999999'
                     },
-                    borderWidth: isSelected ? 4 : (e.Actif ? 2 + Math.floor(centrality * 2) : 1),
-                    opacity: e.Actif ? 1 : 0.5
+                    borderWidth: e.Actif ? 2 + Math.floor(centrality * 2) : 1,
+                    opacity:     e.Actif ? 1 : 0.5
                 };
             });
 
-            // ── LIENS ──────────────────────────────────────────────────────────
+            // ─── Liens ─────────────────────────────────────────────────────────
             const edges = filteredRelations.map(r => {
                 const relType = relationTypes.find(t => t.id === r.Type) || {};
-                let springLength, springConstant;
-
+                let springLength = 150, springConstant = 0.04;
                 if (enableIntensity) {
-                    switch(r.Intensité) {
-                        case 'Forte':   springLength = strongForce; springConstant = 0.08; break;
-                        case 'Moyenne': springLength = 150;         springConstant = 0.04; break;
-                        case 'Faible':  springLength = weakForce;   springConstant = 0.02; break;
-                        default:        springLength = 150;         springConstant = 0.04;
-                    }
-                } else {
-                    springLength = 150;
-                    springConstant = 0.04;
+                    if (r.Intensité === 'Forte')  { springLength = strongForce; springConstant = 0.08; }
+                    if (r.Intensité === 'Faible') { springLength = weakForce;   springConstant = 0.02; }
                 }
-
                 return {
-                    id: r.id,
-                    from: r.Source,
-                    to: r.Cible,
-                    label: relType.Nom || '',
-                    color: { color: relType.Couleur || '#95A5A6' },
-                    width: relType.Épaisseur || 1,
+                    id:     r.id,
+                    from:   r.Source,
+                    to:     r.Cible,
+                    label:  relType.Nom || '',
+                    // title vide : tooltip manuel
+                    title:  '',
+                    color:  { color: relType.Couleur || '#95A5A6' },
+                    width:  relType.Épaisseur || 1,
                     arrows: r.Bidirectionnel ? 'to, from' : 'to',
-                    title: undefined,
                     dashes: r.Intensité === 'Faible',
                     length: springLength,
-                    smooth: {
-                        type: 'continuous',
-                        roundness: r.Intensité === 'Forte' ? 0.2 : 0.5
-                    }
+                    smooth: { type: 'continuous', roundness: r.Intensité === 'Forte' ? 0.2 : 0.5 }
                 };
             });
 
-            // ── OPTIONS ────────────────────────────────────────────────────────
+            // ─── Options ───────────────────────────────────────────────────────
             const options = {
-                nodes: {
-                    borderWidth: 2,
-                    borderWidthSelected: 4,
-                    shadow: true,
+                nodes: { borderWidth: 2, borderWidthSelected: 4, shadow: true,
                     scaling: { min: 10, max: 50, label: { enabled: true, min: 12, max: 20 } }
                 },
-                edges: {
-                    smooth: { type: 'continuous', roundness: 0.5 },
-                    shadow: true
-                },
+                edges: { smooth: { type: 'continuous', roundness: 0.5 }, shadow: true },
                 physics: {
                     enabled: true,
                     barnesHut: {
@@ -1118,7 +1017,7 @@
                 },
                 interaction: {
                     hover: true,
-                    tooltipDelay: 99999,   // Désactiver le tooltip natif vis.js
+                    tooltipDelay: 99999,   // ← Désactive le tooltip natif de vis.js
                     navigationButtons: true,
                     keyboard: true,
                     dragView: true,
@@ -1136,75 +1035,43 @@
             } else {
                 network = new vis.Network(container, data, options);
 
-                // ── ÉVÉNEMENTS TOOLTIP ────────────────────────────────────────
-                network.on('hoverNode', function(params) {
+                // ── Événements tooltip ──────────────────────────────────────────
+                network.on('hoverNode', function (params) {
                     const entity = allEntities.find(e => e.id === params.node);
                     if (!entity) return;
-                    const centrality = centralityScores[params.node];
-                    const html = buildNodeTooltip(entity, centrality);
-                    showTooltip(params.event.clientX, params.event.clientY, html);
+                    showTooltip(
+                        params.pointer.DOM.x,
+                        params.pointer.DOM.y,
+                        buildNodeTooltip(entity)
+                    );
                 });
+                network.on('blurNode', hideTooltip);
 
-                network.on('blurNode', function() {
-                    hideTooltip();
-                });
-
-                network.on('hoverEdge', function(params) {
-                    // Retrouver la relation depuis l'id du edge
-                    const edgeId = params.edge;
-                    const relation = allRelations.find(r => r.id === edgeId);
+                network.on('hoverEdge', function (params) {
+                    const relation = allRelations.find(r => r.id === params.edge);
                     if (!relation) return;
-                    const relType = relationTypes.find(t => t.id === relation.Type);
-                    const sourceEntity = allEntities.find(e => e.id === relation.Source);
-                    const targetEntity = allEntities.find(e => e.id === relation.Cible);
-                    const html = buildEdgeTooltip(relation, relType, sourceEntity, targetEntity);
-                    showTooltip(params.event.clientX, params.event.clientY, html);
+                    showTooltip(
+                        params.pointer.DOM.x,
+                        params.pointer.DOM.y,
+                        buildEdgeTooltip(relation)
+                    );
                 });
+                network.on('blurEdge', hideTooltip);
 
-                network.on('blurEdge', function() {
-                    hideTooltip();
-                });
+                network.on('click',     hideTooltip);
+                network.on('dragStart', hideTooltip);
+                network.on('zoom',      hideTooltip);
 
-                // Masquer le tooltip si on clique ailleurs
-                network.on('click', function() {
-                    hideTooltip();
-                });
-
-                network.on('dragStart', function() {
-                    hideTooltip();
-                });
-
-                network.on('zoom', function() {
-                    hideTooltip();
-                });
-
-                network.on('selectNode', function(params) {
+                network.on('selectNode', function (params) {
                     const entity = allEntities.find(e => e.id === params.nodes[0]);
-                    const centrality = centralityScores[params.nodes[0]];
-                    log('info', `📍 ${entity?.Nom || params.nodes[0]} (centralité: ${(centrality?.normalized * 100).toFixed(0)}%)`);
+                    log('info', `📍 ${entity?.Nom || params.nodes[0]}`);
                 });
 
-                network.on('stabilizationIterationsDone', function() {
+                network.on('stabilizationIterationsDone', function () {
                     log('success', '✅ Stabilisation terminée');
                     network.setOptions({ physics: false });
                 });
             }
-
-            // Mettre à jour la position du tooltip quand la souris bouge sur le canvas
-            container.addEventListener('mousemove', function(e) {
-                if (tooltip.style.display === 'block') {
-                    const tw = tooltip.offsetWidth;
-                    const th = tooltip.offsetHeight;
-                    const ww = window.innerWidth;
-                    const wh = window.innerHeight;
-                    let left = e.clientX + 15;
-                    let top = e.clientY + 15;
-                    if (left + tw > ww - 20) left = e.clientX - tw - 15;
-                    if (top + th > wh - 20) top = e.clientY - th - 15;
-                    tooltip.style.left = left + 'px';
-                    tooltip.style.top = top + 'px';
-                }
-            });
 
             updateInfoPanel(filteredEntities, filteredRelations);
         }
@@ -1213,15 +1080,15 @@
         // Panneau info
         // ═══════════════════════════════════════════════════════════════════════
         function updateInfoPanel(filteredEntities, filteredRelations) {
-            const metrics = calculateNetworkMetrics(filteredEntities, filteredRelations);
+            const m = calculateNetworkMetrics(filteredEntities, filteredRelations);
 
             document.getElementById('metricsContent').innerHTML = `
-                <div class="stats-row"><span>Densité :</span><strong>${(metrics.density * 100).toFixed(1)}%</strong></div>
-                <div class="stats-row"><span>Degré moyen :</span><strong>${metrics.avgDegree.toFixed(1)}</strong></div>
-                <div class="stats-row"><span>Liens forts :</span><strong>${metrics.strongLinks}</strong></div>
-                <div class="stats-row"><span>Liens moyens :</span><strong>${metrics.mediumLinks}</strong></div>
-                <div class="stats-row"><span>Liens faibles :</span><strong>${metrics.weakLinks}</strong></div>
-                ${metrics.maxConnected ? `<div class="stats-total">Plus connecté : <strong>${metrics.maxConnected.Nom}</strong> (${metrics.maxConnections} liens)</div>` : ''}
+                <div class="stats-row"><span>Densité :</span><strong>${(m.density * 100).toFixed(1)}%</strong></div>
+                <div class="stats-row"><span>Degré moyen :</span><strong>${m.avgDegree.toFixed(1)}</strong></div>
+                <div class="stats-row"><span>Liens forts :</span><strong>${m.strong}</strong></div>
+                <div class="stats-row"><span>Liens moyens :</span><strong>${m.medium}</strong></div>
+                <div class="stats-row"><span>Liens faibles :</span><strong>${m.weak}</strong></div>
+                ${m.maxNode ? `<div class="stats-total">Plus connecté : <strong>${m.maxNode.Nom}</strong> (${m.maxDeg} liens)</div>` : ''}
             `;
 
             document.getElementById('statsContent').innerHTML = `
@@ -1231,31 +1098,27 @@
             `;
 
             const usedTypes = new Set(allEntities.map(e => e.Type).filter(Boolean));
-            let entitiesHTML = '';
+            let entHTML = '';
             [...usedTypes].sort((a, b) => getTypeLabel(a).localeCompare(getTypeLabel(b), 'fr')).forEach(type => {
-                const color = getTypeColor(type);
-                const label = getTypeLabel(type);
                 const count = allEntities.filter(e => e.Type === type).length;
-                entitiesHTML += `
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: ${color};"></div>
-                        <span>${label} (${count})</span>
-                    </div>`;
+                entHTML += `<div class="legend-item">
+                    <div class="legend-color" style="background:${getTypeColor(type)};"></div>
+                    <span>${getTypeLabel(type)} (${count})</span>
+                </div>`;
             });
-            document.getElementById('entitiesLegend').innerHTML = entitiesHTML || '<em style="color: #999; font-size: 11px;">Aucune donnée</em>';
+            document.getElementById('entitiesLegend').innerHTML = entHTML || '<em style="color:#999;font-size:11px;">Aucune donnée</em>';
 
-            let relationsHTML = '';
-            relationTypes.forEach(type => {
-                const count = allRelations.filter(r => r.Type === type.id).length;
+            let relHTML = '';
+            relationTypes.forEach(t => {
+                const count = allRelations.filter(r => r.Type === t.id).length;
                 if (count > 0) {
-                    relationsHTML += `
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: ${type.Couleur};"></div>
-                            <span>${type.Nom} (${count})</span>
-                        </div>`;
+                    relHTML += `<div class="legend-item">
+                        <div class="legend-color" style="background:${t.Couleur};"></div>
+                        <span>${t.Nom} (${count})</span>
+                    </div>`;
                 }
             });
-            document.getElementById('relationsLegend').innerHTML = relationsHTML || '<em style="color: #999; font-size: 11px;">Aucune donnée</em>';
+            document.getElementById('relationsLegend').innerHTML = relHTML || '<em style="color:#999;font-size:11px;">Aucune donnée</em>';
         }
 
         // ═══════════════════════════════════════════════════════════════════════
@@ -1265,10 +1128,7 @@
             if (network) {
                 network.setOptions({ physics: { enabled: true } });
                 network.stabilize();
-                setTimeout(() => {
-                    network.setOptions({ physics: { enabled: false } });
-                    log('success', '✅ Layout réinitialisé');
-                }, 3000);
+                setTimeout(() => network.setOptions({ physics: { enabled: false } }), 3000);
             }
         }
 
@@ -1276,19 +1136,18 @@
             if (!network) return;
             const canvas = document.querySelector('#mynetwork canvas');
             const link = document.createElement('a');
-            const date = new Date().toISOString().split('T')[0];
-            link.download = `cartographie_phase1_${date}.png`;
+            link.download = `cartographie_${new Date().toISOString().split('T')[0]}.png`;
             link.href = canvas.toDataURL('image/png');
             link.click();
-            log('success', `📸 Image exportée`);
+            log('success', '📸 Export PNG');
         }
 
         // ═══════════════════════════════════════════════════════════════════════
         // Événements Grist
         // ═══════════════════════════════════════════════════════════════════════
-        grist.onRecords(async function(records) {
+        grist.onRecords(async function () {
             if (dataLoaded) {
-                log('info', '🔔 Mise à jour Grist détectée');
+                log('info', '🔔 Mise à jour Grist');
                 await loadAllData();
             }
         });
