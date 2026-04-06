@@ -595,6 +595,13 @@
                     <span class="t-value">${entity.Responsable}</span>
                 </div>`;
             }
+            if (entity.Contact) {
+                html += `<div class="tooltip-row">
+                    <span class="t-label">Contact</span>
+                    <span class="t-value"><a href="mailto:${entity.Contact}></a></span>
+                </div>`;
+            }
+
 
             html += `<div class="tooltip-metrics">
                     <div class="tooltip-metric">
