@@ -290,8 +290,13 @@
         // TOOLTIP PERSONNALISÉ
         // ═══════════════════════════════════════════════════════════════════════
         const tooltipEl = document.getElementById('custom-tooltip');
+        tooltipEl.addEventListener('mouseenter', function() { tooltipHovered = true; });
+        tooltipEl.addEventListener('mouseleave', function() { tooltipHovered = false; });
+        // Empêcher le clic sur le tooltip de remonter vers le canvas
+        tooltipEl.addEventListener('click', function(e) { e.stopPropagation(); });
         let tooltipVisible = false;
         let tooltipPinned  = false;
+        let tooltipHovered = false;
 
         function showTooltip(x, y, html) {
             tooltipEl.innerHTML = html;
@@ -810,7 +815,7 @@
                     showTooltip(params.pointer.DOM.x, params.pointer.DOM.y, buildNodeTooltip(entity));
                 });
                 // Quitter nœud → masque seulement si pas pinné
-                network.on('blurNode', function() { if (!tooltipPinned && !tooltipEl.matches(':hover')) hideTooltip(); });
+                network.on('blurNode', function() { if (!tooltipPinned && !tooltipHovered) hideTooltip(); });
 
                 // Survol arête → affiche tooltip flottant
                 network.on('hoverEdge', function (params) {
@@ -820,7 +825,7 @@
                     showTooltip(params.pointer.DOM.x, params.pointer.DOM.y, buildEdgeTooltip(relation));
                 });
                 // Quitter arête → masque seulement si pas pinné
-                network.on('blurEdge', function() { if (!tooltipPinned && !tooltipEl.matches(':hover')) hideTooltip(); });
+                network.on('blurEdge', function() { if (!tooltipPinned && !tooltipHovered) hideTooltip(); });
 
                 // Clic sur nœud → fixe le tooltip
                 network.on('click', function (params) {
