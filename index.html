@@ -291,6 +291,7 @@
         // ═══════════════════════════════════════════════════════════════════════
         const tooltipEl = document.getElementById('custom-tooltip');
         let tooltipVisible = false;
+        let tooltipPinned  = false;
 
         function showTooltip(x, y, html) {
             tooltipEl.innerHTML = html;
@@ -302,6 +303,7 @@
         function hideTooltip() {
             tooltipEl.style.display = 'none';
             tooltipVisible = false;
+            tooltipPinned  = false;
         }
 
         function positionTooltip(x, y) {
@@ -317,7 +319,9 @@
             tooltipEl.style.top  = top  + 'px';
         }
 
-        // tooltip fixe au point de clic — pas de suivi souris
+        document.getElementById('mynetwork').addEventListener('mousemove', function(e) {
+            if (tooltipVisible && !tooltipPinned) positionTooltip(e.clientX, e.clientY);
+        });
 
         // ─── Tooltip NŒUD ───────────────────────────────────────────────────
         function buildNodeTooltip(entity) {
@@ -796,16 +800,40 @@
             } else {
                 network = new vis.Network(container, data, options);
 
+                // Survol nœud → affiche tooltip flottant
+                network.on('hoverNode', function (params) {
+                    if (tooltipPinned) return;
+                    const entity = allEntities.find(e => e.id === params.node);
+                    if (!entity) return;
+                    showTooltip(params.pointer.DOM.x, params.pointer.DOM.y, buildNodeTooltip(entity));
+                });
+                // Quitter nœud → masque seulement si pas pinné
+                network.on('blurNode', function() { if (!tooltipPinned) hideTooltip(); });
+
+                // Survol arête → affiche tooltip flottant
+                network.on('hoverEdge', function (params) {
+                    if (tooltipPinned) return;
+                    const relation = allRelations.find(r => r.id === params.edge);
+                    if (!relation) return;
+                    showTooltip(params.pointer.DOM.x, params.pointer.DOM.y, buildEdgeTooltip(relation));
+                });
+                // Quitter arête → masque seulement si pas pinné
+                network.on('blurEdge', function() { if (!tooltipPinned) hideTooltip(); });
+
+                // Clic sur nœud → fixe le tooltip
                 network.on('click', function (params) {
                     if (params.nodes.length > 0) {
                         const entity = allEntities.find(e => e.id === params.nodes[0]);
                         if (!entity) return;
                         showTooltip(params.pointer.DOM.x, params.pointer.DOM.y, buildNodeTooltip(entity));
+                        tooltipPinned = true;
                     } else if (params.edges.length > 0) {
                         const relation = allRelations.find(r => r.id === params.edges[0]);
                         if (!relation) return;
                         showTooltip(params.pointer.DOM.x, params.pointer.DOM.y, buildEdgeTooltip(relation));
+                        tooltipPinned = true;
                     } else {
+                        // Clic sur le fond → dépinne et ferme
                         hideTooltip();
                     }
                 });
