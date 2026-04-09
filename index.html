@@ -94,6 +94,11 @@
             position: fixed; z-index: 9999; pointer-events: auto;
             display: none; max-width: 280px;
             filter: drop-shadow(0 4px 12px rgba(0,0,0,0.2));
+            cursor: default;
+        }
+        #custom-tooltip.pinned {
+            cursor: grab;
+            box-shadow: 0 0 0 2px #3498db55;
         }
         .tooltip-node { background: white; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; }
         .tooltip-header { padding: 10px 14px; color: white; }
@@ -300,6 +305,36 @@
         // Empêcher le clic sur le tooltip de remonter au canvas
         tooltipEl.addEventListener('click', function(e) { e.stopPropagation(); });
 
+        // ── Drag du tooltip une fois pinné ──────────────────────────────────
+        let dragOffset = { x: 0, y: 0 };
+        let isDraggingTooltip = false;
+
+        tooltipEl.addEventListener('mousedown', function(e) {
+            if (!tooltipPinned) return;
+            // Ne pas déclencher le drag si on clique sur un lien
+            if (e.target.tagName === 'A') return;
+            isDraggingTooltip = true;
+            tooltipHovered = true;
+            const rect = tooltipEl.getBoundingClientRect();
+            dragOffset.x = e.clientX - rect.left;
+            dragOffset.y = e.clientY - rect.top;
+            tooltipEl.style.cursor = 'grabbing';
+            e.stopPropagation();
+            e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', function(e) {
+            if (!isDraggingTooltip) return;
+            tooltipEl.style.left = (e.clientX - dragOffset.x) + 'px';
+            tooltipEl.style.top  = (e.clientY - dragOffset.y) + 'px';
+        });
+
+        document.addEventListener('mouseup', function() {
+            if (!isDraggingTooltip) return;
+            isDraggingTooltip = false;
+            tooltipEl.style.cursor = 'default';
+        });
+
         function showTooltip(x, y, html) {
             tooltipEl.innerHTML = html;
             tooltipEl.style.display = 'block';
@@ -307,8 +342,14 @@
             positionTooltip(x, y);
         }
 
+        function pinTooltip() {
+            tooltipPinned = true;
+            tooltipEl.classList.add('pinned');
+        }
+
         function hideTooltip() {
             tooltipEl.style.display = 'none';
+            tooltipEl.classList.remove('pinned');
             tooltipVisible = false;
             tooltipPinned  = false;
             tooltipHovered = false;
@@ -834,12 +875,12 @@
                         const entity = allEntities.find(e => e.id === params.nodes[0]);
                         if (!entity) return;
                         showTooltip(params.pointer.DOM.x, params.pointer.DOM.y, buildNodeTooltip(entity));
-                        tooltipPinned = true;
+                        pinTooltip();
                     } else if (params.edges.length > 0) {
                         const relation = allRelations.find(r => r.id === params.edges[0]);
                         if (!relation) return;
                         showTooltip(params.pointer.DOM.x, params.pointer.DOM.y, buildEdgeTooltip(relation));
-                        tooltipPinned = true;
+                        pinTooltip();
                     } else {
                         hideTooltip();
                     }
